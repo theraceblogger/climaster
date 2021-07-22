@@ -1,5 +1,9 @@
+sudo yum -y update
 sudo yum install postgresql
 sudo yum install postgresql-devel
-sudo apt-get install rsync
-pip3 install sklearn
 sudo yum install git -y
+pip3 install sklearn
+pip3 install psycopg2-binary
+pip3 install requests
+pip3 install pandas
+pip3 install openpyxl

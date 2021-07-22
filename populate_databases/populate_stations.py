@@ -42,7 +42,7 @@ def get_stations(entry_number = 1):
         time.sleep(.5)
         offset = "&offset=" + str(entry_number)
         url = base_url + dataset_id + limit + offset
-        print('Starting entry num: ' + str(entry_number) + ', ' + url)
+        # print('Starting entry num: ' + str(entry_number) + ', ' + url)
         r = requests.get(url, headers=header)
         j = r.json()
 
