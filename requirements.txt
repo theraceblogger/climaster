@@ -1,5 +1,0 @@
-sudo yum install postgresql
-sudo yum install postgresql-devel
-sudo apt-get install rsync
-pip3 install sklearn
-sudo yum install git -y
