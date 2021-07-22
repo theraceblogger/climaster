@@ -1,0 +1,60 @@
+Discover Magazine - How We'll Predict the Next Natural Disaster; by April Reese 2016-07-27
+https://www.discovermagazine.com/planet-earth/how-well-predict-the-next-natural-disaster
+
+Scientific American - Scientists Can Now Blame Individual Natural Disasters on Climate Change; by Chelsea Harvey 2018-01-02
+https://www.scientificamerican.com/article/scientists-can-now-blame-individual-natural-disasters-on-climate-change/
+
+Our World in Data - Natural Disasters; by Hannah Ritchie and Max Roser 2014 revised 2019-11
+https://ourworldindata.org/natural-disasters#:~:text=Natural%20disasters%20kill%20on%20average,from%200.01%25%20to%200.4%25.&text=Deaths%20from%20these%20events%20are,today%20tend%20to%20be%20earthquakes.
+
+Wikipedia - List of disasters by cost
+https://en.wikipedia.org/wiki/List_of_disasters_by_cost
+
+Wikipedia - List of natural disasters by death toll
+https://en.wikipedia.org/wiki/List_of_natural_disasters_by_death_toll
+
+An Analytical Review of Selected Data Sets on Natural Disasters and Impacts - March 2006
+https://reliefweb.int/sites/reliefweb.int/files/resources/E8C77BAB463772B585257264006328EA-undp-datasets-mar06.pdf
+
+NOAA data
+https://www.ncdc.noaa.gov/cdo-web/webservices/v2#gettingStarted
+
+NOAA data AWS
+https://docs.opendata.aws/noaa-ghcn-pds/readme.html
+
+EMDAT data
+https://public.emdat.be/data
+https://www.emdat.be/guidelines
+
+WHO data
+https://www.who.int/data/gho/info/gho-odata-api
+
+Stack Abuse - Getting Started with Python's Wikipedia API
+https://stackabuse.com/getting-started-with-pythons-wikipedia-api/
+
+arXiv - Tackling Climate Change with Machine Learning; (page 36 Climate Prediction by Kelly Kochanski) 2019-06-10 revised 2019-11-05
+https://arxiv.org/pdf/1906.05433.pdf
+
+arXiv - Application of Deep Convolutional Neural Networks for Detecting Extreme Weather in Climate Datasets; Yunjie Liu, Evan Racah, Prabhat, Joaquin Correa, Amir Khosrowshahi, David Lavers, Kenneth Kunkel, Michael Wehner and William Collins 2016-05-04
+https://arxiv.org/pdf/1605.01156.pdf
+
+Climate change with applied ML
+https://www.climatechange.ai/
+
+
+
+Science Daily - Earth Scientists Use Fractals To Measure And Predict Natural Disasters; American Institute Of Physics 2002-01-31
+https://www.sciencedaily.com/releases/2002/01/020131073853.htm#:~:text=Earth%20Scientists%20Use%20Fractals%20To%20Measure%20And%20Predict%20Natural%20Disasters,-Date%3A%20January%2031&text=Predicting%20the%20size%2C%20location%2C%20and,wildfires%2C%20and%20landslides%20using%20fractals.
+
+Github - Fractal-Alert; by Yash Raj Bharti
+https://github.com/yashrajbharti/Fractal-Alert
+
+Science.gov - multitude of papers on fractals and earthquakes
+https://www.science.gov/topicpages/e/earthquakes+suggests+fractal
+
+Kaggle - LANL Earthquake Prediction : Fresh EDA; by Tarun Paparaju
+https://www.kaggle.com/tarunpaparaju/lanl-earthquake-prediction-fresh-eda
+
+https://climate.nasa.gov/effects/
+
+https://www.ncdc.noaa.gov/ghcn-daily-description
