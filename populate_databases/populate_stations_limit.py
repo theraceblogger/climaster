@@ -66,7 +66,6 @@ def get_centermost_point(cluster):
     centroid = (MultiPoint(cluster).centroid.x, MultiPoint(cluster).centroid.y)
     centermost_point = min(cluster, key=lambda point: great_circle(point, centroid).m)
     return tuple(centermost_point)
-# centermost_points = clusters.map(get_centermost_point)
 
 
 # choose point in cluster with highest coverage
@@ -98,7 +97,13 @@ def get_stations():
     print(f'original number of stations: {len(stations)}')
     clusters = cluster_stations(stations)
     print(f'number of clusters: {len(clusters)}')
-    df = get_highest_coverage_station(clusters, stations)
+
+    centermost_points = clusters.map(get_centermost_point)
+    lats, lons = zip(*centermost_points)
+    rep_points = pd.DataFrame({'lat':lats, 'lon':lons})
+    df = rep_points.apply(lambda row: stations[(stations['latitude']==row['lat']) & (stations['longitude']==row['lon'])].iloc[0], axis=1)
+    
+    # df = get_highest_coverage_station(clusters, stations)
     print(f'final number of stations: {len(df)}')
     df = add_cc(df)
     results = df.to_dict('records')
@@ -108,7 +113,7 @@ def get_stations():
             insert_sql = "INSERT INTO weather.stations_raw_limit (station_id, station_jsonb) VALUES (%s,%s) ON CONFLICT (station_id) DO UPDATE SET station_jsonb = %s"
             cur.execute(insert_sql, (result['id'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True))) 
         except:
-            print ('could not iterate through results')
+            print (f'could not iterate through results \n{result}')
 
 
 get_stations()
