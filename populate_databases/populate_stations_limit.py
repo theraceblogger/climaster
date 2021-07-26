@@ -106,9 +106,7 @@ def get_stations():
     df = get_highest_coverage_station(clusters, stations)
     print(f'final number of stations: {len(df)}')
     df = add_cc(df)
-    j = df.to_json('records')
-    results = json.loads(j)
-    # results = df.to_dict('records')
+    results = df.to_dict('records')
 
     for result in results:
         try:
