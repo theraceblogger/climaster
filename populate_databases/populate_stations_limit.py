@@ -92,10 +92,10 @@ rs = rep_points.apply(lambda row: stations[(stations['latitude']==row['lat']) & 
 
 # df = add_cc(rs)
 j = rs.to_json(orient="records")
-
+results = json.loads(j)
 # print (j)
 
-for result in j:
+for result in results:
     print(result['id'])
     # try:
     #     insert_sql = "INSERT INTO weather.stations_raw (station_id, station_jsonb) VALUES (%s,%s) ON CONFLICT (station_id) DO UPDATE SET station_jsonb = %s"
