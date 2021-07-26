@@ -104,7 +104,7 @@ def cluster_stations(stations):
 # df_cc.to_csv('/home/theraceblogger/weather-db-example/stations_10active_30span.csv', index=False)
 
 def get_highest_coverage_station(clusters):
-    points = pd.dataframe()
+    points = pd.DataFrame()
     for cluster in clusters:
         lats, lons = zip(*cluster)
         cluster_df = pd.DataFrame({'lat':lats, 'lon':lons})
@@ -127,7 +127,7 @@ def get_stations():
     flat_results = []
     for result in results:
         flat_results.append(result[0])
-    stations = pd.dataframe(flat_results)
+    stations = pd.DataFrame(flat_results)
 
     clusters = cluster_stations(stations)
     df = get_highest_coverage_station(clusters)
