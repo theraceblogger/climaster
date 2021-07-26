@@ -90,10 +90,10 @@ lats, lons = zip(*centermost_points)
 rep_points = pd.DataFrame({'lon':lons, 'lat':lats})
 rs = rep_points.apply(lambda row: stations[(stations['latitude']==row['lat']) & (stations['longitude']==row['lon'])].iloc[0], axis=1)
 
-df = add_cc(rs)
-j = df.to_json(orient="records")
+# df = add_cc(rs)
+j = rs.to_json(orient="records")
 
-print (len(j))
+print (j[0])
 
 # for result in j:
 #     print result
