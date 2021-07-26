@@ -93,7 +93,7 @@ rs = rep_points.apply(lambda row: stations[(stations['latitude']==row['lat']) & 
 # df = add_cc(rs)
 j = rs.to_json(orient="records")
 
-print (j[0])
+print (j)
 
 # for result in j:
 #     print result
