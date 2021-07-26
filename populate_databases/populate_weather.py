@@ -3,7 +3,6 @@ import os
 import psycopg2
 from psycopg2.extras import DictCursor
 import requests
-from datetime import datetime
 import json
 import time
 import pandas as pd
@@ -41,15 +40,16 @@ end_date = "&enddate="
 limit = "&limit=1000"
 offset = "&offset="
 
+
 # Function gets weather station id, mindate and maxdate
 # Calls get_data() for each weather station's data
 def get_meta():
-    query = "SELECT sr.station_id, sr.station_jsonb ->> 'mindate', sr.station_jsonb ->> 'maxdate' FROM weather.stations_raw sr"
+    query = "SELECT srl.station_id, srl.station_jsonb ->> 'mindate', srl.station_jsonb ->> 'maxdate' FROM weather.stations_raw_limit srl"
     cur.execute(query)
     return cur.fetchall()
-    #print(len(results))
-    # for result in results:
-    #     get_data(result)
+    for result in results:
+        get_data(result)
+
 
 # Function gets data by customizing the iterations from the metadata and calling load_data()
 def get_data(result): # result is a list of strings
@@ -74,6 +74,7 @@ def get_data(result): # result is a list of strings
             url = base_url + dataset_id + station_id + station + start_date + str(int(start_yr) + year) + "-01-01" + end_date + str(int(start_yr) + year) + "-12-31" + limit + offset
             load_data(url)
 
+
 # Function gets the data and inserts it into the database, 1000 at a time
 def load_data(url, off_set=1):
     try:
@@ -94,23 +95,4 @@ def load_data(url, off_set=1):
         pass
 
 
-
 results = get_meta()
-
-loaded = pd.read_csv('/home/theraceblogger/weather-db-example/loaded.csv')
-loaded = loaded['0'].tolist()
-
-print("Number of stations loaded:", len(loaded))
-#loaded = []
-
-def iter_result():
-    for i in range(len(loaded), len(results)):
-        try:
-            get_data(results[i])
-            loaded.append(results[i][0])
-        except Exception as error:
-            loaded_df = pd.DataFrame(loaded)
-            loaded_df.to_csv('/home/theraceblogger/weather-db-example/loaded.csv', index=False)
-            raise error
-
-iter_result()

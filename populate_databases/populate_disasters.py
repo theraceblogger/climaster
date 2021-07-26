@@ -1,9 +1,8 @@
-## This script gets data from EMDAT and loads it into the database
+## This script gets data from EMDAT and loads it into weather.emdat_raw
 import os
 import psycopg2
 from psycopg2.extras import DictCursor
 import requests
-from datetime import datetime
 import json
 import pandas as pd
 

@@ -1,4 +1,4 @@
-## This script gets stations data from NOAA, reduces stations with a clustering algorithm (DBSCAN),
+## This script gets stations data from weather.stations_raw database, reduces stations with a clustering algorithm (DBSCAN),
 ## adds the 2 letter country code, and stores it in weather.stations_raw_limit
 import os
 import psycopg2
