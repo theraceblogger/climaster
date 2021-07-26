@@ -40,10 +40,11 @@ end_date = "&enddate="
 limit = "&limit=1000"
 offset = "&offset="
 
-print('start')
+
 # Function gets weather station id, mindate and maxdate
 # Calls get_data() for each weather station's data
 def get_meta():
+    print('start')
     query = "SELECT srl.station_id, srl.station_jsonb ->> 'mindate', srl.station_jsonb ->> 'maxdate' FROM weather.stations_raw_limit srl"
     cur.execute(query)
     return cur.fetchall()
