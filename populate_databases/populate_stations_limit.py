@@ -88,7 +88,7 @@ centermost_points = clusters.map(get_centermost_point)
 
 lats, lons = zip(*centermost_points)
 rep_points = pd.DataFrame({'lon':lons, 'lat':lats})
-rs = rep_points.apply(lambda row: df[(df['latitude']==row['lat']) & (df['longitude']==row['lon'])].iloc[0], axis=1)
+rs = rep_points.apply(lambda row: stations[(stations['latitude']==row['lat']) & (stations['longitude']==row['lon'])].iloc[0], axis=1)
 
 df = add_cc(rs)
 j = df.to_json(orient="records")
