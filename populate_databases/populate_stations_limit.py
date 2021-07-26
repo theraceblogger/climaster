@@ -96,7 +96,7 @@ j = rs.to_json(orient="records")
 # print (j)
 
 for result in j:
-    print result
+    print(result)
     # try:
     #     insert_sql = "INSERT INTO weather.stations_raw (station_id, station_jsonb) VALUES (%s,%s) ON CONFLICT (station_id) DO UPDATE SET station_jsonb = %s"
     #     cur.execute(insert_sql, (result['id'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True))) 
