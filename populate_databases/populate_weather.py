@@ -47,6 +47,7 @@ def get_meta():
     query = "SELECT srl.station_id, srl.station_jsonb ->> 'mindate', srl.station_jsonb ->> 'maxdate' FROM weather.stations_raw_limit srl"
     cur.execute(query)
     return cur.fetchall()
+    print(len(results))
     for result in results:
         get_data(result)
 
