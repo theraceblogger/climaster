@@ -68,7 +68,7 @@ stations = get_stations()
 print(f'Original number of stations: {len(stations)}')
     
 def cluster_stations(stations):    
-    coords = df[['latitude', 'longitude']].to_numpy()
+    coords = stations[['latitude', 'longitude']].to_numpy()
     kms_per_radian = 6371.0088
     epsilon = 35 / kms_per_radian
     db = DBSCAN(eps=epsilon, min_samples=1, algorithm='ball_tree', metric='haversine').fit(np.radians(coords))
