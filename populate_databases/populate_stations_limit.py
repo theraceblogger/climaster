@@ -91,8 +91,9 @@ rep_points = pd.DataFrame({'lon':lons, 'lat':lats})
 rs = rep_points.apply(lambda row: stations[(stations['latitude']==row['lat']) & (stations['longitude']==row['lon'])].iloc[0], axis=1)
 
 df = add_cc(rs)
-j = df.to_json(orient="records")
-results = json.loads(j)
+# j = df.to_json(orient="records")
+# results = json.loads(j)
+results = df.to_dict('records')
 
 for result in results:
     try:
