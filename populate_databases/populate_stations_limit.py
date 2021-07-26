@@ -109,7 +109,7 @@ def get_highest_coverage_station(clusters, stations):
         lats, lons = zip(*cluster)
         cluster_df = pd.DataFrame({'lat':lats, 'lon':lons})
         cluster_df = cluster_df.apply(lambda row: stations[(stations['latitude']==row['lat']) & (stations['longitude']==row['lon'])].iloc[0], axis=1)
-        points.append(max(cluster_df, key='datacoverage'), ignore_index=True, sort=False)
+        points.append(max(cluster_df, key=datacoverage), ignore_index=True, sort=False)
     print(points)
     return points
 
