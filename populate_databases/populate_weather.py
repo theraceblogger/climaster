@@ -95,4 +95,4 @@ def load_data(url, off_set=1):
         pass
 
 
-results = get_meta()
+get_meta()
