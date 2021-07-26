@@ -49,6 +49,72 @@ def add_cc(df):
     return df
 
 
+# def get_stations():
+#     # query = 'SELECT sr.station_jsonb FROM weather.stations_raw sr'
+#     query = 'SELECT sr.station_jsonb\
+#         FROM weather.stations_raw sr\
+#             WHERE (sr.station_jsonb ->> \'maxdate\')::date >= CURRENT_DATE - INTERVAL \'10 years\'\
+#                 AND (sr.station_jsonb ->> \'maxdate\')::date - INTERVAL \'30 years\' >= (sr.station_jsonb ->> \'mindate\')::date'
+#     cur.execute(query)
+#     results = cur.fetchall()
+    
+#     flat_results = []
+#     for result in results:
+#         flat_results.append(result[0])
+    
+#     return pd.DataFrame(flat_results)
+    
+# stations = get_stations()
+# print(f'Original number of stations: {len(stations)}')
+    
+def cluster_stations(stations):    
+    coords = stations[['latitude', 'longitude']].to_numpy()
+    kms_per_radian = 6371.0088
+    epsilon = 35 / kms_per_radian
+    db = DBSCAN(eps=epsilon, min_samples=1, algorithm='ball_tree', metric='haversine').fit(np.radians(coords))
+    cluster_labels = db.labels_
+    num_clusters = len(set(cluster_labels))
+    clusters = pd.Series([coords[cluster_labels == n] for n in range(num_clusters)])
+    return clusters
+
+# clusters = cluster_stations(stations)
+# print(f'Number of clusters: {len(clusters)}')
+
+# def get_centermost_point(cluster):
+#     centroid = (MultiPoint(cluster).centroid.x, MultiPoint(cluster).centroid.y)
+#     centermost_point = min(cluster, key=lambda point: great_circle(point, centroid).m)
+#     return tuple(centermost_point)
+# centermost_points = clusters.map(get_centermost_point)
+
+# lats, lons = zip(*centermost_points)
+# rep_points = pd.DataFrame({'lon':lons, 'lat':lats})
+# rs = rep_points.apply(lambda row: stations[(stations['latitude']==row['lat']) & (stations['longitude']==row['lon'])].iloc[0], axis=1)
+
+# df = add_cc(rs)
+# j = df.to_json(orient="records")
+# results = json.loads(j)
+# results = df.to_dict('records')
+
+# for result in results:
+#     try:
+#         insert_sql = "INSERT INTO weather.stations_raw_limit (station_id, station_jsonb) VALUES (%s,%s) ON CONFLICT (station_id) DO UPDATE SET station_jsonb = %s"
+#         cur.execute(insert_sql, (result['id'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True))) 
+#     except:
+#         print ('could not iterate through results')
+# df_cc.to_csv('/home/theraceblogger/weather-db-example/stations_10active_30span.csv', index=False)
+
+def get_highest_coverage_station(clusters):
+    points = pd.dataframe()
+    for cluster in clusters:
+        lats, lons = zip(*cluster)
+        cluster_df = pd.DataFrame({'lat':lats, 'lon':lons})
+        cluster_df = cluster_df.apply(lambda row: stations[(stations['latitude']==row['lat']) & (stations['longitude']==row['lon'])].iloc[0], axis=1)
+        points.append(max(cluster_df, key='datacoverage'), ignore_index=True, sort=False)
+    print(points)
+    return points
+
+
+
 def get_stations():
     # query = 'SELECT sr.station_jsonb FROM weather.stations_raw sr'
     query = 'SELECT sr.station_jsonb\
@@ -61,44 +127,11 @@ def get_stations():
     flat_results = []
     for result in results:
         flat_results.append(result[0])
-    
-    return pd.DataFrame(flat_results)
-    
-stations = get_stations()
-print(f'Original number of stations: {len(stations)}')
-    
-def cluster_stations(stations):    
-    coords = stations[['latitude', 'longitude']].to_numpy()
-    kms_per_radian = 6371.0088
-    epsilon = 35 / kms_per_radian
-    db = DBSCAN(eps=epsilon, min_samples=1, algorithm='ball_tree', metric='haversine').fit(np.radians(coords))
-    cluster_labels = db.labels_
-    num_clusters = len(set(cluster_labels))
-    clusters = pd.Series([coords[cluster_labels == n] for n in range(num_clusters)])
-    return clusters
+    stations = pd.dataframe(flat_results)
 
-clusters = cluster_stations(stations)
-print(f'Number of clusters: {len(clusters)}')
+    clusters = cluster_stations(stations)
+    df = get_highest_coverage_station(clusters)
 
-def get_centermost_point(cluster):
-    centroid = (MultiPoint(cluster).centroid.x, MultiPoint(cluster).centroid.y)
-    centermost_point = min(cluster, key=lambda point: great_circle(point, centroid).m)
-    return tuple(centermost_point)
-centermost_points = clusters.map(get_centermost_point)
 
-lats, lons = zip(*centermost_points)
-rep_points = pd.DataFrame({'lon':lons, 'lat':lats})
-rs = rep_points.apply(lambda row: stations[(stations['latitude']==row['lat']) & (stations['longitude']==row['lon'])].iloc[0], axis=1)
 
-df = add_cc(rs)
-# j = df.to_json(orient="records")
-# results = json.loads(j)
-results = df.to_dict('records')
-
-for result in results:
-    try:
-        insert_sql = "INSERT INTO weather.stations_raw_limit (station_id, station_jsonb) VALUES (%s,%s) ON CONFLICT (station_id) DO UPDATE SET station_jsonb = %s"
-        cur.execute(insert_sql, (result['id'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True))) 
-    except:
-        print ('could not iterate through results')
-# df_cc.to_csv('/home/theraceblogger/weather-db-example/stations_10active_30span.csv', index=False)
+get_stations()
