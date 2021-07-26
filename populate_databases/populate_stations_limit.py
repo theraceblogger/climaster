@@ -98,15 +98,17 @@ def get_stations():
     clusters = cluster_stations(stations)
     print(f'number of clusters: {len(clusters)}')
 
-    centermost_points = clusters.map(get_centermost_point)
-    lats, lons = zip(*centermost_points)
-    rep_points = pd.DataFrame({'lat':lats, 'lon':lons})
-    df = rep_points.apply(lambda row: stations[(stations['latitude']==row['lat']) & (stations['longitude']==row['lon'])].iloc[0], axis=1)
+    # centermost_points = clusters.map(get_centermost_point)
+    # lats, lons = zip(*centermost_points)
+    # rep_points = pd.DataFrame({'lat':lats, 'lon':lons})
+    # df = rep_points.apply(lambda row: stations[(stations['latitude']==row['lat']) & (stations['longitude']==row['lon'])].iloc[0], axis=1)
     
-    # df = get_highest_coverage_station(clusters, stations)
+    df = get_highest_coverage_station(clusters, stations)
     print(f'final number of stations: {len(df)}')
     df = add_cc(df)
-    results = df.to_dict('records')
+    j = df.to_json('records')
+    results = json.loads(j)
+    # results = df.to_dict('records')
 
     for result in results:
         try:
