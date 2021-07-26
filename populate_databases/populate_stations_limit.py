@@ -105,14 +105,13 @@ def get_stations():
     df = add_cc(df)
     j = df.to_json(orient='records')
     results = json.loads(j)
-    # results = df.to_dict('records')
 
     for result in results:
         try:
             insert_sql = "INSERT INTO weather.stations_raw_limit (station_id, station_jsonb) VALUES (%s,%s) ON CONFLICT (station_id) DO UPDATE SET station_jsonb = %s"
             cur.execute(insert_sql, (result['id'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True))) 
         except:
-            print (f'could not iterate through results \n{result}')
+            print ('could not iterate through results')
 
 
 get_stations()
