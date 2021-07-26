@@ -95,8 +95,11 @@ def get_stations():
         flat_results.append(result[0])
     stations = pd.DataFrame(flat_results)
 
+    print(f'original number of stations: {len(stations}')
     clusters = cluster_stations(stations)
+    print(f'number of clusters: {len(clusters}')
     df = get_highest_coverage_station(clusters, stations)
+    print(f'final number of stations: {len(df}')
     df = add_cc(df)
     results = df.to_dict('records')
 
