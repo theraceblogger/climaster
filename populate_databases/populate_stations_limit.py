@@ -90,16 +90,14 @@ lats, lons = zip(*centermost_points)
 rep_points = pd.DataFrame({'lon':lons, 'lat':lats})
 rs = rep_points.apply(lambda row: stations[(stations['latitude']==row['lat']) & (stations['longitude']==row['lon'])].iloc[0], axis=1)
 
-# df = add_cc(rs)
-j = rs.to_json(orient="records")
+df = add_cc(rs)
+j = df.to_json(orient="records")
 results = json.loads(j)
-# print (j)
 
 for result in results:
-    print(result['id'])
-    # try:
-    #     insert_sql = "INSERT INTO weather.stations_raw (station_id, station_jsonb) VALUES (%s,%s) ON CONFLICT (station_id) DO UPDATE SET station_jsonb = %s"
-    #     cur.execute(insert_sql, (result['id'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True))) 
-    # except:
-    #     print ('could not iterate through results')
+    try:
+        insert_sql = "INSERT INTO weather.stations_raw (station_id, station_jsonb) VALUES (%s,%s) ON CONFLICT (station_id) DO UPDATE SET station_jsonb = %s"
+        cur.execute(insert_sql, (result['id'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True))) 
+    except:
+        print ('could not iterate through results')
 # df_cc.to_csv('/home/theraceblogger/weather-db-example/stations_10active_30span.csv', index=False)
