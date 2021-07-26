@@ -40,7 +40,7 @@ end_date = "&enddate="
 limit = "&limit=1000"
 offset = "&offset="
 
-
+print('start')
 # Function gets weather station id, mindate and maxdate
 # Calls get_data() for each weather station's data
 def get_meta():
