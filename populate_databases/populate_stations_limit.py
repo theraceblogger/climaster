@@ -91,12 +91,12 @@ rep_points = pd.DataFrame({'lon':lons, 'lat':lats})
 rs = rep_points.apply(lambda row: stations[(stations['latitude']==row['lat']) & (stations['longitude']==row['lon'])].iloc[0], axis=1)
 
 # df = add_cc(rs)
-j = rs.to_json(orient="records")
+# j = rs.to_json(orient="records")
 
-# print (j)
+print (rs[0])
 
-for result in j:
-    print(result)
+# for result in rs:
+#     print(result)
     # try:
     #     insert_sql = "INSERT INTO weather.stations_raw (station_id, station_jsonb) VALUES (%s,%s) ON CONFLICT (station_id) DO UPDATE SET station_jsonb = %s"
     #     cur.execute(insert_sql, (result['id'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True))) 
