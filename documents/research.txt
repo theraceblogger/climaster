@@ -22,6 +22,9 @@ https://www.ncdc.noaa.gov/cdo-web/webservices/v2#gettingStarted
 NOAA data AWS
 https://docs.opendata.aws/noaa-ghcn-pds/readme.html
 
+GHCN documentation
+https://www.ncei.noaa.gov/data/global-historical-climatology-network-daily/doc/GHCND_documentation.pdf
+
 EMDAT data
 https://public.emdat.be/data
 https://www.emdat.be/guidelines

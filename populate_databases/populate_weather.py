@@ -34,6 +34,7 @@ noaa_token = os.environ['noaa_token']
 header = {'token': noaa_token}
 base_url = "https://www.ncdc.noaa.gov/cdo-web/api/v2/data"
 dataset_id = "?datasetid=GHCND"
+datatype_id = "&datatypeid=TAVG&TMIN&TMAX&PRCP&SNOW"
 station_id = "&stationid="
 start_date = "&startdate="
 end_date = "&enddate="
@@ -59,19 +60,19 @@ def get_data(result): # result is a list of strings
 
     for year in range(num_years):
         if num_years == 1:
-            url = base_url + dataset_id + station_id + station + start_date + start + end_date + end + limit + offset
+            url = base_url + dataset_id + datatype_id + station_id + station + start_date + start + end_date + end + limit + offset
             load_data(url)
 
         elif year == 0:
-            url = base_url + dataset_id + station_id + station + start_date + start + end_date + start_yr + "-12-31" + limit + offset
+            url = base_url + dataset_id + datatype_id + station_id + station + start_date + start + end_date + start_yr + "-12-31" + limit + offset
             load_data(url)
 
         elif year == num_years - 1:
-            url = base_url + dataset_id + station_id + station + start_date + end_yr + "-01-01" + end_date + end + limit + offset
+            url = base_url + dataset_id + datatype_id + station_id + station + start_date + end_yr + "-01-01" + end_date + end + limit + offset
             load_data(url)
 
         else:
-            url = base_url + dataset_id + station_id + station + start_date + str(int(start_yr) + year) + "-01-01" + end_date + str(int(start_yr) + year) + "-12-31" + limit + offset
+            url = base_url + dataset_id + datatype_id + station_id + station + start_date + str(int(start_yr) + year) + "-01-01" + end_date + str(int(start_yr) + year) + "-12-31" + limit + offset
             load_data(url)
 
 
