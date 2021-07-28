@@ -93,7 +93,8 @@ def get_stations():
     for result in results:
         flat_results.append(result[0])
     stations = pd.DataFrame(flat_results)
-
+    
+    # stations = pd.read_csv('/Users/chuckschultz/climaster/CSVs/stations_10active_30span.csv')
     clusters = cluster_stations(stations)
 
     # centermost_points = clusters.map(get_centermost_point)
@@ -103,15 +104,26 @@ def get_stations():
     
     df = get_highest_coverage_station(clusters, stations)
     df = add_cc(df)
-    j = df.to_json(orient='records')
-    results = json.loads(j)
 
-    for result in results:
-        try:
-            insert_sql = "INSERT INTO weather.stations_raw_limit (station_id, station_jsonb) VALUES (%s,%s) ON CONFLICT (station_id) DO UPDATE SET station_jsonb = %s"
-            cur.execute(insert_sql, (result['id'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True))) 
-        except:
-            print ('could not iterate through results')
+    stations_by_country_dict = {}
+    for row in df.iterrows():
+        if row.cc not in stations_by_country_dict:
+            stations_by_country_dict[row.cc] = [row.id]
+        else:
+            stations_by_country_dict[row.cc].append(row.id)
+    print(len(stations_by_country_dict))
+    print(stations_by_country_dict)
+    pd.DataFrame(stations_by_country_dict).to_csv('/Users/chuckschultz/climaster/CSVs/stations_by_country.csv')
+
+    # j = df.to_json(orient='records')
+    # results = json.loads(j)
+
+    # for result in results:
+    #     try:
+    #         insert_sql = "INSERT INTO weather.stations_raw_limit (station_id, station_jsonb) VALUES (%s,%s) ON CONFLICT (station_id) DO UPDATE SET station_jsonb = %s"
+    #         cur.execute(insert_sql, (result['id'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True))) 
+    #     except:
+    #         print ('could not iterate through results')
 
 
 get_stations()
