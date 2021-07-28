@@ -106,7 +106,7 @@ def get_stations():
     df = add_cc(df)
 
     stations_by_country_dict = {}
-    for row in df.iterrows():
+    for row in df.itertuples():
         if row.cc not in stations_by_country_dict:
             stations_by_country_dict[row.cc] = [row.id]
         else:
