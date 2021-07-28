@@ -96,6 +96,7 @@ def get_stations():
     
     clusters = cluster_stations(stations)
 
+    ## use this code to choose the station closest to the centroid
     # centermost_points = clusters.map(get_centermost_point)
     # lats, lons = zip(*centermost_points)
     # rep_points = pd.DataFrame({'lat':lats, 'lon':lons})
@@ -118,15 +119,15 @@ def get_stations():
         except:
             print ('could not iterate through results')
     
-    # j = df.to_json(orient='records')
-    # results = json.loads(j)
+    j = df.to_json(orient='records')
+    results = json.loads(j)
 
-    # for result in results:
-    #     try:
-    #         insert_sql = "INSERT INTO weather.stations_raw_limit (station_id, station_jsonb) VALUES (%s,%s) ON CONFLICT (station_id) DO UPDATE SET station_jsonb = %s"
-    #         cur.execute(insert_sql, (result['id'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True))) 
-    #     except:
-    #         print ('could not iterate through results')
+    for result in results:
+        try:
+            insert_sql = "INSERT INTO weather.stations_raw_limit (station_id, station_jsonb) VALUES (%s,%s) ON CONFLICT (station_id) DO UPDATE SET station_jsonb = %s"
+            cur.execute(insert_sql, (result['id'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True))) 
+        except:
+            print ('could not iterate through results')
 
 
 get_stations()
