@@ -112,8 +112,11 @@ def get_stations():
         else:
             stations_by_country_dict[row.cc].append(row.id)
     print(len(stations_by_country_dict))
-    print(stations_by_country_dict)
-    pd.DataFrame(stations_by_country_dict).to_csv('/Users/chuckschultz/climaster/CSVs/stations_by_country.csv')
+    # print(stations_by_country_dict)
+    # pd.DataFrame(stations_by_country_dict).to_csv('/Users/chuckschultz/climaster/CSVs/stations_by_country.csv')
+    file = '/Users/chuckschultz/climaster/CSVs/stations_by_country.json' 
+    with open(file, 'w') as f: 
+        json.dump(stations_by_country_dict, f)
 
     # j = df.to_json(orient='records')
     # results = json.loads(j)
