@@ -113,7 +113,7 @@ def get_stations():
     
     for country, station in stations_by_country_dict.items():
         try:
-            insert_sql = "INSERT INTO weather.stations_by_country (country, stations_jsonb, stations_count) VALUES (%s,%s,%s) ON CONFLICT (country) DO UPDATE SET (stations_jsonb = %s, stations_count = %s)"
+            insert_sql = "INSERT INTO weather.stations_by_country (country, stations_jsonb, stations_count) VALUES (%s,%s,%s) ON CONFLICT (country) DO UPDATE SET stations_jsonb = %s, stations_count = %s"
             cur.execute(insert_sql, (country, json.dumps(station, indent=4, sort_keys=True), len(station), json.dumps(station, indent=4, sort_keys=True), len(station)))
         except:
             print ('could not iterate through results')
