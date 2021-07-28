@@ -111,13 +111,14 @@ def get_stations():
             stations_by_country_dict[row.cc] = [row.id]
         else:
             stations_by_country_dict[row.cc].append(row.id)
-    print(len(stations_by_country_dict))
-    # print(stations_by_country_dict)
-    # pd.DataFrame(stations_by_country_dict).to_csv('/Users/chuckschultz/climaster/CSVs/stations_by_country.csv')
-    file = '/Users/chuckschultz/climaster/CSVs/stations_by_country.json' 
-    with open(file, 'w') as f: 
-        json.dump(stations_by_country_dict, f)
-
+    
+    for station in stations_by_country_dict:
+        try:
+            insert_sql = "INSERT INTO weather.stations_by_country (country, stations_jsonb) VALUES (%s,%s) ON CONFLICT (country) DO UPDATE SET stations_jsonb = %s"
+            cur.execute(insert_sql, (station.key(), json.dumps(station.value(), indent=4, sort_keys=True), json.dumps(station.value(), indent=4, sort_keys=True))) 
+        except:
+            print ('could not iterate through results')
+    
     # j = df.to_json(orient='records')
     # results = json.loads(j)
 
