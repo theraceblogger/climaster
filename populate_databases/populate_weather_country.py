@@ -56,7 +56,7 @@ def load_data(url, country, datatype, off_set=1):
             load_data(url, country, datatype, off_set)
     except KeyError:
         pass
-    except simplejson.scanner.JSONDecodeError:
+    except JSONDecodeError:
         pass
 
 
