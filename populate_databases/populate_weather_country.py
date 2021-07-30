@@ -32,8 +32,8 @@ cur = db_connect()
 datatypes = ['TAVG', 'TMIN', 'TMAX', 'PRCP', 'SNOW']
 
 def create_table(country, datatype):
-    query = f"DROP TABLE weather.{country}_{datatype}"
-    cur.execute(query)
+    # query = f"DROP TABLE weather.{country}_{datatype}"
+    # cur.execute(query)
     query = f"CREATE TABLE weather.{country}_{datatype} (station_id varchar(255) NOT NULL, date varchar(255) NOT NULL, datatype varchar(255) NOT NULL, value int, attributes varchar(255), CONSTRAINT PK_{country}_{datatype} PRIMARY KEY (station_id, date, datatype))"
     cur.execute(query)
 
