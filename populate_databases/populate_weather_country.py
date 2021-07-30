@@ -38,6 +38,26 @@ def create_table(country, datatype):
     cur.execute(query)
 
 
+# Function gets the data and inserts it into the database, 1000 at a time
+def load_data(url, country, datatype, off_set=1):
+    try:
+        url2 = url + str(off_set)
+        time.sleep(10)
+        r = requests.get(url2, headers=header)
+        j = r.json()
+        for result in j['results']:
+            try:
+                insert_sql = f"INSERT INTO weather.{country}_{datatype} (station_id, date, data_type, value, attributes) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (station_id, date, data_type) DO UPDATE SET value = %s, attributes = %s"
+                cur.execute(insert_sql, (result['station'], result['date'], result['datatype'], result['value'], result['attributes'], result['value'], result['attributes']))
+            except:
+                print ('could not iterate through results')
+        off_set += 1000
+        if (off_set <= j['metadata']['resultset']['count']):
+            load_data(url, country, datatype, off_set)
+    except KeyError:
+        pass
+
+
 # Set variables
 noaa_token = os.environ['noaa_token']
 header = {'token': noaa_token}
@@ -75,24 +95,7 @@ for result in results:
 
 
 
-# Function gets the data and inserts it into the database, 1000 at a time
-def load_data(url, country, datatype, off_set=1):
-    try:
-        url2 = url + str(off_set)
-        time.sleep(10)
-        r = requests.get(url2, headers=header)
-        j = r.json()
-        for result in j['results']:
-            try:
-                insert_sql = f"INSERT INTO weather.{country}_{datatype} (station_id, date, data_type, value, attributes) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (station_id, date, data_type) DO UPDATE SET value = %s, attributes = %s"
-                cur.execute(insert_sql, (result['station'], result['date'], result['datatype'], result['value'], result['attributes'], result['value'], result['attributes']))
-            except:
-                print ('could not iterate through results')
-        off_set += 1000
-        if (off_set <= j['metadata']['resultset']['count']):
-            load_data(url, country, datatype, off_set)
-    except KeyError:
-        pass
+
 
 
 
