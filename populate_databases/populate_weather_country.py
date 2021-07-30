@@ -29,7 +29,7 @@ def db_connect():
 cur = db_connect()
 
 
-datatypes = [TAVG, TMIN, TMAX, PRCP, SNOW]
+datatypes = ['TAVG', 'TMIN', 'TMAX', 'PRCP', 'SNOW']
 
 def create_table(country, datatype):
     query = f"DROP TABLE weather.{country}_{datatype}"
