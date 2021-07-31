@@ -84,7 +84,7 @@ def get_highest_coverage_station(clusters, stations):
 def get_stations():
     query = 'SELECT sr.station_jsonb\
         FROM weather.stations_raw sr\
-            WHERE (sr.station_jsonb ->> \'maxdate\')::date >= CURRENT_DATE - INTERVAL \'10 years\'\
+            WHERE (sr.station_jsonb ->> \'maxdate\')::date >= CURRENT_DATE - INTERVAL \'1 years\'\
                 AND (sr.station_jsonb ->> \'maxdate\')::date - INTERVAL \'30 years\' >= (sr.station_jsonb ->> \'mindate\')::date'
     cur.execute(query)
     results = cur.fetchall()

@@ -90,7 +90,7 @@ for result in results:
     for station in result[1]:
         for type in datatypes:
             create_table(result[0], type)
-            url = base_url + dataset_id + datatype_id + type + station_id + station + start_date + "1980-01-01" + end_date + "2020-12-31" + limit + offset
+            url = base_url + dataset_id + datatype_id + type + station_id + station + start_date + "1990-01-01" + end_date + "2020-12-31" + limit + offset
             load_data(url, result[0], type)
         stations_loaded[result[0]] = stations_loaded[result[0]] + 1
         insert_sql = f"INSERT INTO weather.stations_loaded (country, stations_loaded, stations_count) VALUES (%s,%s,%s) ON CONFLICT (country) DO UPDATE SET stations_loaded = %s, stations_count = %s"
