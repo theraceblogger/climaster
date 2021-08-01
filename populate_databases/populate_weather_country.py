@@ -68,8 +68,7 @@ def get_data(station):
     query = f"SELECT srl.station_jsonb ->> 'mindate', srl.station_jsonb ->> 'maxdate' FROM weather.stations_raw_limit srl WHERE srl.station_id = '{station}'"
     cur.execute(query)
     meta = cur.fetchall()
-    print(meta)
-    start, end = meta[0], meta[1]
+    start, end = meta[0][0], meta[0][1]
     start_yr, end_yr = start[:4], end[:4]
     num_years = int(end_yr) - int(start_yr) +1
 
@@ -116,7 +115,7 @@ results = cur.fetchall()
 stations_loaded = {}
 for result in results:  # for country in table
     stations_loaded[result[0]] = 0  # initialize dictionary entry
-    # create_table(result[0])  # create table for country
+    create_table(result[0])  # create table for country
     for station in result[1]:  # for station in country
         get_data(station)  # get station data and load
     stations_loaded[result[0]] = stations_loaded[result[0]] + 1
