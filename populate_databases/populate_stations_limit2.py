@@ -153,9 +153,9 @@ def get_stations():
     stations_by_country_dict = {}
     for row in df.itertuples():
         if row.cc not in stations_by_country_dict:
-        stations_by_country_dict[row.cc] = [row.id]
-    else:
-        stations_by_country_dict[row.cc].append(row.id)
+            stations_by_country_dict[row.cc] = [row.id]
+        else:
+            stations_by_country_dict[row.cc].append(row.id)
     
     for country, station in stations_by_country_dict.items():
         try:
