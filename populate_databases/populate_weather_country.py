@@ -42,8 +42,10 @@ def create_table(country):
 def load_data(url, country, off_set=1):
     try:
         url2 = url + str(off_set)
+        print(url2)
         time.sleep(10)
         r = requests.get(url2, headers=header)
+        print(r)
         j = r.json()
         for result in j['results']:
             try:
@@ -95,7 +97,7 @@ results = cur.fetchall()
 stations_loaded = {}
 for result in results:
     stations_loaded[result[0]] = 0
-    create_table(result[0])
+    # create_table(result[0])
     for station in result[1]:
         meta = get_meta(station)
         print(result[0], meta)
