@@ -70,7 +70,7 @@ def get_stations():  # 14,386 stations
     country_list = df.cc.unique().tolist()
     print(country_list, len(country_list))
     for country in country_list:
-        country_df = df[df.cc = country]
+        country_df = df[df.cc == country]
         print(country_df)
         break
         cluster_stations_country(country_df)
