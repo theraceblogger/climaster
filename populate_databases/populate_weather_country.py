@@ -109,7 +109,6 @@ results = cur.fetchall()
 
 for result in results:  # for country in table (entire row)
     stations_loaded = 0
-    stations_loaded[result[0]] = 0  # initialize dictionary entry
     create_table(result[0])  # create table for country
     for station in result[1]:  # for station in country
         get_data(station, result[0])  # get station data and load
