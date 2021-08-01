@@ -95,15 +95,15 @@ results = cur.fetchall()
 stations_loaded = {}
 for result in results:
     stations_loaded[result[0]] = 0
-    # create_table(result[0])
+    create_table(result[0])
     for station in result[1]:
         meta = get_meta(station)
         print(result[0], meta)
-    #     url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + "1990-01-01" + end_date + "2020-12-31" + limit + offset
-    #     load_data(url, result[0])
-    # stations_loaded[result[0]] = stations_loaded[result[0]] + 1
-    # insert_sql = f"INSERT INTO weather.stations_loaded (country, stations_loaded, stations_count) VALUES (%s,%s,%s) ON CONFLICT (country) DO UPDATE SET stations_loaded = %s, stations_count = %s"
-    # cur.execute(insert_sql, (result[0], stations_loaded[result[0]], result[3], stations_loaded[result[0]], result[3]))
+        url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + meta[0] + end_date + meta[1] + limit + offset
+        load_data(url, result[0])
+    stations_loaded[result[0]] = stations_loaded[result[0]] + 1
+    insert_sql = f"INSERT INTO weather.stations_loaded (country, stations_loaded, stations_count) VALUES (%s,%s,%s) ON CONFLICT (country) DO UPDATE SET stations_loaded = %s, stations_count = %s"
+    cur.execute(insert_sql, (result[0], stations_loaded[result[0]], result[3], stations_loaded[result[0]], result[3]))
     break
 
 
