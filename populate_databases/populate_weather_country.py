@@ -61,6 +61,9 @@ def get_data(station, country):
     meta = cur.fetchall()
     start, end = meta[0][0], meta[0][1]
     start_yr, end_yr = start[:4], end[:4]
+    if int(start_yr) <= 1990:
+        start_yr = '1990'
+        start = '1990-01-01'
     num_years = int(end_yr) - int(start_yr) +1
 
     for year in range(num_years):
@@ -86,7 +89,7 @@ header = {'token': noaa_token}
 base_url = "https://www.ncdc.noaa.gov/cdo-web/api/v2/data"
 dataset_id = "?datasetid=GHCND"
 datatype_id = "&datatypeid="
-datatype = "TMIN&TMAX&PRCP&SNOW&SNWD"
+datatype = "TMIN,TMAX,PRCP,SNOW,SNWD"
 station_id = "&stationid="
 start_date = "&startdate="
 end_date = "&enddate="
@@ -104,16 +107,16 @@ query = "SELECT country, stations_jsonb, stations_count FROM weather.stations_by
 cur.execute(query)
 results = cur.fetchall()
 
-stations_loaded = {}
 for result in results:  # for country in table (entire row)
+    stations_loaded = 0
     stations_loaded[result[0]] = 0  # initialize dictionary entry
     create_table(result[0])  # create table for country
     for station in result[1]:  # for station in country
         get_data(station, result[0])  # get station data and load
-        stations_loaded[result[0]] = stations_loaded[result[0]] + 1
-        try:
+        stations_loaded += 1
+        try:  # update number of stations_loaded by country
             insert_sql = "INSERT INTO weather.stations_loaded (country, stations_loaded, stations_count) VALUES (%s,%s,%s) ON CONFLICT (country) DO UPDATE SET stations_loaded = %s, stations_count = %s"
-            cur.execute(insert_sql, (result[0], stations_loaded[result[0]], result[2], stations_loaded[result[0]], result[2]))
+            cur.execute(insert_sql, (result[0], stations_loaded, result[2], stations_loaded, result[2]))
         except:
             print ('could not update stations_loaded')
 
