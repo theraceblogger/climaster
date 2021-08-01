@@ -49,8 +49,8 @@ def load_data(url, country, off_set=1):
             # insert_sql = f"INSERT INTO weather.{country} (station_id, date, datatype, value, attributes) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (station_id, date, datatype) DO UPDATE SET value = %s, attributes = %s"
             # cur.execute(insert_sql, (result['station'], result['date'], result['datatype'], result['value'], result['attributes'], result['value'], result['attributes']))
             try:
-                insert_sql = "INSERT INTO weather.%s (station_id, date, data_type, value, attributes) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (station_id, date, data_type) DO UPDATE SET value = %s, attributes = %s"
-                cur.execute(insert_sql, (country, result['station'], result['date'], result['datatype'], result['value'], result['attributes'], result['value'], result['attributes']))
+                insert_sql = f"INSERT INTO weather.{country} (station_id, date, datatype, value, attributes) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (station_id, date, datatype) DO UPDATE SET value = %s, attributes = %s"
+                cur.execute(insert_sql, (result['station'], result['date'], result['datatype'], result['value'], result['attributes'], result['value'], result['attributes']))
             except:
                 print ('could not iterate through results')
         off_set += 1000
