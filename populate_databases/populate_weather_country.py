@@ -98,7 +98,7 @@ for result in results:
     # create_table(result[0])
     for station in result[1]:
         meta = get_meta(station)
-        print(meta)
+        print(result, meta)
     #     url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + "1990-01-01" + end_date + "2020-12-31" + limit + offset
     #     load_data(url, result[0])
     # stations_loaded[result[0]] = stations_loaded[result[0]] + 1
