@@ -64,7 +64,7 @@ def load_data(url, country, off_set=1):
 
         
 # Function gets data by customizing the iterations from the metadata and calling load_data()
-def get_data(station):
+def get_data(station, country):
     query = f"SELECT srl.station_jsonb ->> 'mindate', srl.station_jsonb ->> 'maxdate' FROM weather.stations_raw_limit srl WHERE srl.station_id = '{station}'"
     cur.execute(query)
     meta = cur.fetchall()
@@ -75,19 +75,19 @@ def get_data(station):
     for year in range(num_years):
         if num_years == 1:
             url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + start + end_date + end + limit + offset
-            load_data(url)
+            load_data(url, country)
 
         elif year == 0:
             url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + start + end_date + start_yr + "-12-31" + limit + offset
-            load_data(url)
+            load_data(url, country)
 
         elif year == num_years - 1:
             url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + end_yr + "-01-01" + end_date + end + limit + offset
-            load_data(url)
+            load_data(url, country)
 
         else:
             url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + str(int(start_yr) + year) + "-01-01" + end_date + str(int(start_yr) + year) + "-12-31" + limit + offset
-            load_data(url)
+            load_data(url, country)
 
 # Set variables
 noaa_token = os.environ['noaa_token']
@@ -113,11 +113,11 @@ cur.execute(query)
 results = cur.fetchall()
 
 stations_loaded = {}
-for result in results:  # for country in table
+for result in results:  # for country in table (entire row)
     stations_loaded[result[0]] = 0  # initialize dictionary entry
     create_table(result[0])  # create table for country
     for station in result[1]:  # for station in country
-        get_data(station)  # get station data and load
+        get_data(station, result[0])  # get station data and load
     stations_loaded[result[0]] = stations_loaded[result[0]] + 1
     insert_sql = f"INSERT INTO weather.stations_loaded (country, stations_loaded, stations_count) VALUES (%s,%s,%s) ON CONFLICT (country) DO UPDATE SET stations_loaded = %s, stations_count = %s"
     cur.execute(insert_sql, (result[0], stations_loaded[result[0]], result[3], stations_loaded[result[0]], result[3]))
