@@ -49,11 +49,12 @@ def add_cc(df):
     return df
 
 
+# clustering algorithm
+def cluster_stations_country(country_df):
 
 
 
-
-def get_stations():
+def get_stations():  # 14,386 stations
     query = 'SELECT sr.station_jsonb\
         FROM weather.stations_raw sr\
             WHERE (sr.station_jsonb ->> \'maxdate\')::date >= CURRENT_DATE - INTERVAL \'1 years\'\
@@ -65,7 +66,15 @@ def get_stations():
     for result in results:
         flat_results.append(result[0])
     stations = pd.DataFrame(flat_results)
-    print(stations.info())
+    df = add_cc(stations)
+    country_list = df.cc.unique().tolist()
+    print(country_list, len(country_list))
+    for country in country_list:
+        country_df = df[df.cc = country]
+        print(country_df)
+        break
+        cluster_stations_country(country_df)
+
 
 
 
