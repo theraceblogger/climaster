@@ -125,36 +125,36 @@ for result in results:
 
 # Function gets weather station id, mindate and maxdate
 # Calls get_data() for each weather station's data
-def get_meta():
-    query = "SELECT srl.station_id, srl.station_jsonb ->> 'mindate', srl.station_jsonb ->> 'maxdate' FROM weather.stations_raw_limit srl"
-    cur.execute(query)
-    results = cur.fetchall()
-    for result in results:
+# def get_meta():
+#     query = "SELECT srl.station_id, srl.station_jsonb ->> 'mindate', srl.station_jsonb ->> 'maxdate' FROM weather.stations_raw_limit srl"
+#     cur.execute(query)
+#     results = cur.fetchall()
+#     for result in results:
         # get_data(result)
 
 
 # Function gets data by customizing the iterations from the metadata and calling load_data()
-def get_data(result): # result is a list of strings
-    station, start, end = result[0], result[1], result[2]
-    start_yr, end_yr = start[:4], end[:4]
-    num_years = int(end_yr) - int(start_yr) +1
+# def get_data(result): # result is a list of strings
+#     station, start, end = result[0], result[1], result[2]
+#     start_yr, end_yr = start[:4], end[:4]
+#     num_years = int(end_yr) - int(start_yr) +1
 
-    for year in range(num_years):
-        if num_years == 1:
-            url = base_url + dataset_id + datatype_id + station_id + station + start_date + start + end_date + end + limit + offset
-            load_data(url)
+#     for year in range(num_years):
+#         if num_years == 1:
+#             url = base_url + dataset_id + datatype_id + station_id + station + start_date + start + end_date + end + limit + offset
+#             load_data(url)
 
-        elif year == 0:
-            url = base_url + dataset_id + datatype_id + station_id + station + start_date + start + end_date + start_yr + "-12-31" + limit + offset
-            load_data(url)
+#         elif year == 0:
+#             url = base_url + dataset_id + datatype_id + station_id + station + start_date + start + end_date + start_yr + "-12-31" + limit + offset
+#             load_data(url)
 
-        elif year == num_years - 1:
-            url = base_url + dataset_id + datatype_id + station_id + station + start_date + end_yr + "-01-01" + end_date + end + limit + offset
-            load_data(url)
+#         elif year == num_years - 1:
+#             url = base_url + dataset_id + datatype_id + station_id + station + start_date + end_yr + "-01-01" + end_date + end + limit + offset
+#             load_data(url)
 
-        else:
-            url = base_url + dataset_id + datatype_id + station_id + station + start_date + str(int(start_yr) + year) + "-01-01" + end_date + str(int(start_yr) + year) + "-12-31" + limit + offset
-            load_data(url)
+#         else:
+#             url = base_url + dataset_id + datatype_id + station_id + station + start_date + str(int(start_yr) + year) + "-01-01" + end_date + str(int(start_yr) + year) + "-12-31" + limit + offset
+#             load_data(url)
 
 
 # get_meta()
