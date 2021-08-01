@@ -94,8 +94,6 @@ def load_stations_cc():  # Limit: 14,386 stations
 
     df = add_cc(stations)
 
-    country_list = df.cc.unique().tolist()  # All: 224 countries, Limit: 195 countries
-
     j = df.to_json(orient='records')
     results = json.loads(j)
 
@@ -105,20 +103,9 @@ def load_stations_cc():  # Limit: 14,386 stations
             cur.execute(insert_sql, (result['id'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True))) 
         except:
             print ('could not iterate through results')
-    return country_list
 
 
-# country_list = load_stations_cc()
-query = 'SELECT src.station_jsonb FROM weather.stations_raw_cc src'
-cur.execute(query)
-results = cur.fetchall()
-
-flat_results = []
-for result in results:
-    flat_results.append(result[0])
-df = pd.DataFrame(flat_results)
-
-country_list = df.cc.unique().tolist()
+# load_stations_cc()
 
 
 # main function
@@ -134,6 +121,9 @@ def get_stations():
     for result in results:
         flat_results.append(result[0])
     stations = pd.DataFrame(flat_results)
+
+    country_list = stations.cc.unique().tolist()
+    print(len(country_list))
     
     df = pd.DataFrame()
 
