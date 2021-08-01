@@ -148,7 +148,7 @@ def get_stations():
         # df = rep_points.apply(lambda row: stations[(stations['latitude']==row['lat']) & (stations['longitude']==row['lon'])].iloc[0], axis=1)
 
         cluster_df = get_highest_coverage_station(clusters, country_df)
-        df = pd.concat(df, cluster_df, ignore_index=True)
+        df = pd.concat([df, cluster_df], ignore_index=True)
 
     stations_by_country_dict = {}
     for row in df.itertuples():
