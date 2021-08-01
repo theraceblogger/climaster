@@ -31,15 +31,15 @@ cur = db_connect()
 
 datatypes = ['TAVG', 'TMIN', 'TMAX', 'PRCP', 'SNOW']
 
-def create_table(country, datatype):
+def create_table(country):
     # query = f"DROP TABLE weather.{country}_{datatype}"
     # cur.execute(query)
-    query = f"CREATE TABLE weather.{country}_{datatype} (station_id varchar(255) NOT NULL, date varchar(255) NOT NULL, datatype varchar(255) NOT NULL, value int, attributes varchar(255), CONSTRAINT PK_{country}_{datatype} PRIMARY KEY (station_id, date, datatype))"
+    query = f"CREATE TABLE weather.{country} (station_id varchar(255) NOT NULL, date varchar(255) NOT NULL, datatype varchar(255) NOT NULL, value int, attributes varchar(255), CONSTRAINT PK_{country} PRIMARY KEY (station_id, date, datatype))"
     cur.execute(query)
 
 
 # Function gets the data and inserts it into the database, 1000 at a time
-def load_data(url, country, datatype, off_set=1):
+def load_data(url, country, off_set=1):
     try:
         url2 = url + str(off_set)
         time.sleep(10)
@@ -47,18 +47,18 @@ def load_data(url, country, datatype, off_set=1):
         j = r.json()
         for result in j['results']:
             try:
-                insert_sql = f"INSERT INTO weather.{country}_{datatype} (station_id, date, data_type, value, attributes) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (station_id, date, data_type) DO UPDATE SET value = %s, attributes = %s"
+                insert_sql = f"INSERT INTO weather.{country} (station_id, date, data_type, value, attributes) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (station_id, date, data_type) DO UPDATE SET value = %s, attributes = %s"
                 cur.execute(insert_sql, (result['station'], result['date'], result['datatype'], result['value'], result['attributes'], result['value'], result['attributes']))
             except:
                 print ('could not iterate through results')
         off_set += 1000
         if (off_set <= j['metadata']['resultset']['count']):
-            load_data(url, country, datatype, off_set)
+            load_data(url, country, off_set)
     except KeyError:
         pass
-    except Exception as error:
-        print(error)
-        pass
+    # except Exception as error:
+    #     print(error)
+    #     pass
 
 
 # Set variables
@@ -67,6 +67,7 @@ header = {'token': noaa_token}
 base_url = "https://www.ncdc.noaa.gov/cdo-web/api/v2/data"
 dataset_id = "?datasetid=GHCND"
 datatype_id = "&datatypeid="
+datatype = "TMIN&TMAX&PRCP&SNOW&SNWD"
 station_id = "&stationid="
 start_date = "&startdate="
 end_date = "&enddate="
@@ -75,9 +76,8 @@ offset = "&offset="
 
 
 # query stations_by_country
-# create_table for each datatype (5 per country)
+# create_table for country
 # get noaa data for each station and insert into tables
-# try max 50 stations at a time
 # track each station and country
 
 query = "SELECT country, stations_jsonb, stations_count FROM weather.stations_by_country"
@@ -87,14 +87,13 @@ results = cur.fetchall()
 stations_loaded = {}
 for result in results:
     stations_loaded[result[0]] = 0
+    create_table(result[0])
     for station in result[1]:
-        for type in datatypes:
-            create_table(result[0], type)
-            url = base_url + dataset_id + datatype_id + type + station_id + station + start_date + "1990-01-01" + end_date + "2020-12-31" + limit + offset
-            load_data(url, result[0], type)
-        stations_loaded[result[0]] = stations_loaded[result[0]] + 1
-        insert_sql = f"INSERT INTO weather.stations_loaded (country, stations_loaded, stations_count) VALUES (%s,%s,%s) ON CONFLICT (country) DO UPDATE SET stations_loaded = %s, stations_count = %s"
-        cur.execute(insert_sql, (result[0], stations_loaded[result[0]], result[3], stations_loaded[result[0]], result[3]))
+        url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + "1990-01-01" + end_date + "2020-12-31" + limit + offset
+        load_data(url, result[0])
+    stations_loaded[result[0]] = stations_loaded[result[0]] + 1
+    insert_sql = f"INSERT INTO weather.stations_loaded (country, stations_loaded, stations_count) VALUES (%s,%s,%s) ON CONFLICT (country) DO UPDATE SET stations_loaded = %s, stations_count = %s"
+    cur.execute(insert_sql, (result[0], stations_loaded[result[0]], result[3], stations_loaded[result[0]], result[3]))
 
 
 
