@@ -62,14 +62,32 @@ def load_data(url, country, off_set=1):
     #     print(error)
     #     pass
 
-# Function gets weather station id, mindate and maxdate
-def get_meta(station):
+        
+# Function gets data by customizing the iterations from the metadata and calling load_data()
+def get_data(station):
     query = f"SELECT srl.station_jsonb ->> 'mindate', srl.station_jsonb ->> 'maxdate' FROM weather.stations_raw_limit srl WHERE srl.station_id = '{station}'"
     cur.execute(query)
-    results = cur.fetchall()
-    return results[0]
-        
+    meta = cur.fetchall()
+    start, end = result[0], result[1]
+    start_yr, end_yr = start[:4], end[:4]
+    num_years = int(end_yr) - int(start_yr) +1
 
+    for year in range(num_years):
+        if num_years == 1:
+            url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + start + end_date + end + limit + offset
+            load_data(url)
+
+        elif year == 0:
+            url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + start + end_date + start_yr + "-12-31" + limit + offset
+            load_data(url)
+
+        elif year == num_years - 1:
+            url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + end_yr + "-01-01" + end_date + end + limit + offset
+            load_data(url)
+
+        else:
+            url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + str(int(start_yr) + year) + "-01-01" + end_date + str(int(start_yr) + year) + "-12-31" + limit + offset
+            load_data(url)
 
 # Set variables
 noaa_token = os.environ['noaa_token']
@@ -95,14 +113,11 @@ cur.execute(query)
 results = cur.fetchall()
 
 stations_loaded = {}
-for result in results:
-    stations_loaded[result[0]] = 0
-    # create_table(result[0])
-    for station in result[1]:
-        meta = get_meta(station)
-        print(result[0], meta)
-        url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + meta[0] + end_date + meta[1] + limit + offset
-        load_data(url, result[0])
+for result in results:  # for country in table
+    stations_loaded[result[0]] = 0  # initialize dictionary entry
+    # create_table(result[0])  # create table for country
+    for station in result[1]:  # for station in country
+        get_data(station)  # get station data and load
     stations_loaded[result[0]] = stations_loaded[result[0]] + 1
     insert_sql = f"INSERT INTO weather.stations_loaded (country, stations_loaded, stations_count) VALUES (%s,%s,%s) ON CONFLICT (country) DO UPDATE SET stations_loaded = %s, stations_count = %s"
     cur.execute(insert_sql, (result[0], stations_loaded[result[0]], result[3], stations_loaded[result[0]], result[3]))
@@ -135,28 +150,7 @@ for result in results:
         # get_data(result)
 
 
-# Function gets data by customizing the iterations from the metadata and calling load_data()
-# def get_data(result): # result is a list of strings
-#     station, start, end = result[0], result[1], result[2]
-#     start_yr, end_yr = start[:4], end[:4]
-#     num_years = int(end_yr) - int(start_yr) +1
 
-#     for year in range(num_years):
-#         if num_years == 1:
-#             url = base_url + dataset_id + datatype_id + station_id + station + start_date + start + end_date + end + limit + offset
-#             load_data(url)
-
-#         elif year == 0:
-#             url = base_url + dataset_id + datatype_id + station_id + station + start_date + start + end_date + start_yr + "-12-31" + limit + offset
-#             load_data(url)
-
-#         elif year == num_years - 1:
-#             url = base_url + dataset_id + datatype_id + station_id + station + start_date + end_yr + "-01-01" + end_date + end + limit + offset
-#             load_data(url)
-
-#         else:
-#             url = base_url + dataset_id + datatype_id + station_id + station + start_date + str(int(start_yr) + year) + "-01-01" + end_date + str(int(start_yr) + year) + "-12-31" + limit + offset
-#             load_data(url)
 
 
 # get_meta()
