@@ -68,6 +68,7 @@ def get_data(station):
     query = f"SELECT srl.station_jsonb ->> 'mindate', srl.station_jsonb ->> 'maxdate' FROM weather.stations_raw_limit srl WHERE srl.station_id = '{station}'"
     cur.execute(query)
     meta = cur.fetchall()
+    print(meta)
     start, end = meta[0], meta[1]
     start_yr, end_yr = start[:4], end[:4]
     num_years = int(end_yr) - int(start_yr) +1
