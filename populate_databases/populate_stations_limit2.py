@@ -56,9 +56,9 @@ def add_cc(df):
 
 def get_stations():  # 14,386 stations
     query = 'SELECT sr.station_jsonb\
-        FROM weather.stations_raw sr\
-            WHERE (sr.station_jsonb ->> \'maxdate\')::date >= CURRENT_DATE - INTERVAL \'1 years\'\
-                AND (sr.station_jsonb ->> \'maxdate\')::date - INTERVAL \'30 years\' >= (sr.station_jsonb ->> \'mindate\')::date'
+        FROM weather.stations_raw sr
+            # WHERE (sr.station_jsonb ->> \'maxdate\')::date >= CURRENT_DATE - INTERVAL \'1 years\'\
+            #     AND (sr.station_jsonb ->> \'maxdate\')::date - INTERVAL \'30 years\' >= (sr.station_jsonb ->> \'mindate\')::date'
     cur.execute(query)
     results = cur.fetchall()
     
@@ -68,12 +68,22 @@ def get_stations():  # 14,386 stations
     stations = pd.DataFrame(flat_results)
     df = add_cc(stations)
     country_list = df.cc.unique().tolist()
-    print(country_list, len(country_list))
-    for country in country_list:
-        country_df = df[df.cc == country]
-        print(country_df)
-        break
-        cluster_stations_country(country_df)
+    print(len(country_list))  # 195 countries
+
+    j = df.to_json(orient='records')
+    results = json.loads(j)
+
+    for result in results:
+        try:
+            insert_sql = "INSERT INTO weather.stations_raw_cc (station_id, station_jsonb) VALUES (%s,%s) ON CONFLICT (station_id) DO UPDATE SET station_jsonb = %s"
+            cur.execute(insert_sql, (result['id'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True))) 
+        except:
+            print ('could not iterate through results')
+    # for country in country_list:
+    #     country_df = df[df.cc == country]
+    #     print(country_df)
+    #     break
+    #     cluster_stations_country(country_df)
 
 
 
