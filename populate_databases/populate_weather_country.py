@@ -42,15 +42,13 @@ def create_table(country):
 def load_data(url, country, off_set=1):
     try:
         url2 = url + str(off_set)
-        print(url2)
         time.sleep(10)
         r = requests.get(url2, headers=header)
-        print(r)
         j = r.json()
         for result in j['results']:
             try:
-                insert_sql = f"INSERT INTO weather.{country} (station_id, date, data_type, value, attributes) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (station_id, date, data_type) DO UPDATE SET value = %s, attributes = %s"
-                cur.execute(insert_sql, (result['station'], result['date'], result['datatype'], result['value'], result['attributes'], result['value'], result['attributes']))
+                insert_sql = "INSERT INTO weather.%s (station_id, date, data_type, value, attributes) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (station_id, date, data_type) DO UPDATE SET value = %s, attributes = %s"
+                cur.execute(insert_sql, (country, result['station'], result['date'], result['datatype'], result['value'], result['attributes'], result['value'], result['attributes']))
             except:
                 print ('could not iterate through results')
         off_set += 1000
@@ -114,13 +112,18 @@ results = cur.fetchall()
 
 stations_loaded = {}
 for result in results:  # for country in table (entire row)
+    print(result)
     stations_loaded[result[0]] = 0  # initialize dictionary entry
-    create_table(result[0])  # create table for country
+    # create_table(result[0])  # create table for country
     for station in result[1]:  # for station in country
         get_data(station, result[0])  # get station data and load
     stations_loaded[result[0]] = stations_loaded[result[0]] + 1
-    insert_sql = f"INSERT INTO weather.stations_loaded (country, stations_loaded, stations_count) VALUES (%s,%s,%s) ON CONFLICT (country) DO UPDATE SET stations_loaded = %s, stations_count = %s"
-    cur.execute(insert_sql, (result[0], stations_loaded[result[0]], result[3], stations_loaded[result[0]], result[3]))
+    print(stations_loaded)
+    try:
+        insert_sql = "INSERT INTO weather.stations_loaded (country, stations_loaded, stations_count) VALUES (%s,%s,%s) ON CONFLICT (country) DO UPDATE SET stations_loaded = %s, stations_count = %s"
+        cur.execute(insert_sql, (result[0], stations_loaded[result[0]], result[3], stations_loaded[result[0]], result[3]))
+    except:
+        print ('could not update stations_loaded')
     break
 
 
