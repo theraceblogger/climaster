@@ -62,7 +62,7 @@ def load_data(url, country, off_set=1):
 
 # Function gets weather station id, mindate and maxdate
 def get_meta(station):
-    query = f"SELECT srl.station_jsonb ->> 'mindate', srl.station_jsonb ->> 'maxdate' FROM weather.stations_raw_limit srl WHERE srl.station_id = {station}"
+    query = f"SELECT srl.station_jsonb ->> 'mindate', srl.station_jsonb ->> 'maxdate' FROM weather.stations_raw_limit srl WHERE srl.station_id = '{station}'"
     cur.execute(query)
     results = cur.fetchall()
     return results
