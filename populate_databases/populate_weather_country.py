@@ -65,7 +65,7 @@ def get_meta(station):
     query = f"SELECT srl.station_jsonb ->> 'mindate', srl.station_jsonb ->> 'maxdate' FROM weather.stations_raw_limit srl WHERE srl.station_id = '{station}'"
     cur.execute(query)
     results = cur.fetchall()
-    return results
+    return results[0]
         
 
 
@@ -98,7 +98,7 @@ for result in results:
     # create_table(result[0])
     for station in result[1]:
         meta = get_meta(station)
-        print(result, meta)
+        print(result[0], meta)
     #     url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + "1990-01-01" + end_date + "2020-12-31" + limit + offset
     #     load_data(url, result[0])
     # stations_loaded[result[0]] = stations_loaded[result[0]] + 1
