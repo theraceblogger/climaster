@@ -128,6 +128,9 @@ def get_stations():
 
     for country in country_list:
         country_df = stations[stations.cc == country]
+        if len(country_df) < 10:
+            df = pd.concat([df, country_df], ignore_index=True)
+            continue
         clusters = cluster_stations_country(country_df)
 
         ## use this code to choose the station closest to the centroid
@@ -136,8 +139,8 @@ def get_stations():
         # rep_points = pd.DataFrame({'lat':lats, 'lon':lons})
         # df = rep_points.apply(lambda row: stations[(stations['latitude']==row['lat']) & (stations['longitude']==row['lon'])].iloc[0], axis=1)
 
-        cluster_df = get_highest_coverage_station(clusters, country_df)
-        df = pd.concat([df, cluster_df], ignore_index=True)
+        country_df = get_highest_coverage_station(clusters, country_df)
+        df = pd.concat([df, country_df], ignore_index=True)
 
     stations_by_country_dict = {}
     for row in df.itertuples():
