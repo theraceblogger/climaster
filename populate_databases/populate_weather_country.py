@@ -29,11 +29,7 @@ def db_connect():
 cur = db_connect()
 
 
-# datatypes = ['TAVG', 'TMIN', 'TMAX', 'PRCP', 'SNOW']
-
 def create_table(country):
-    # query = f"DROP TABLE weather.{country}_{datatype}"
-    # cur.execute(query)
     query = f"CREATE TABLE weather.{country} (station_id varchar(255) NOT NULL, date varchar(255) NOT NULL, datatype varchar(255) NOT NULL, value int, attributes varchar(255), CONSTRAINT PK_{country} PRIMARY KEY (station_id, date, datatype))"
     cur.execute(query)
 
@@ -46,8 +42,6 @@ def load_data(url, country, off_set=1):
         r = requests.get(url2, headers=header)
         j = r.json()
         for result in j['results']:
-            # insert_sql = f"INSERT INTO weather.{country} (station_id, date, datatype, value, attributes) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (station_id, date, datatype) DO UPDATE SET value = %s, attributes = %s"
-            # cur.execute(insert_sql, (result['station'], result['date'], result['datatype'], result['value'], result['attributes'], result['value'], result['attributes']))
             try:
                 insert_sql = f"INSERT INTO weather.{country} (station_id, date, datatype, value, attributes) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (station_id, date, datatype) DO UPDATE SET value = %s, attributes = %s"
                 cur.execute(insert_sql, (result['station'], result['date'], result['datatype'], result['value'], result['attributes'], result['value'], result['attributes']))
@@ -71,19 +65,19 @@ def get_data(station, country):
 
     for year in range(num_years):
         if num_years == 1:
-            url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + start + end_date + end + limit + offset
+            url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + start + end_date + end + units + limit + offset
             load_data(url, country)
 
         elif year == 0:
-            url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + start + end_date + start_yr + "-12-31" + limit + offset
+            url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + start + end_date + start_yr + "-12-31" + units + limit + offset
             load_data(url, country)
 
         elif year == num_years - 1:
-            url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + end_yr + "-01-01" + end_date + end + limit + offset
+            url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + end_yr + "-01-01" + end_date + end + units + limit + offset
             load_data(url, country)
 
         else:
-            url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + str(int(start_yr) + year) + "-01-01" + end_date + str(int(start_yr) + year) + "-12-31" + limit + offset
+            url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + str(int(start_yr) + year) + "-01-01" + end_date + str(int(start_yr) + year) + "-12-31" + units + limit + offset
             load_data(url, country)
 
 # Set variables
@@ -96,6 +90,7 @@ datatype = "TMIN&TMAX&PRCP&SNOW&SNWD"
 station_id = "&stationid="
 start_date = "&startdate="
 end_date = "&enddate="
+units = "&units=standard"
 limit = "&limit=1000"
 offset = "&offset="
 
@@ -121,37 +116,4 @@ for result in results:  # for country in table (entire row)
             cur.execute(insert_sql, (result[0], stations_loaded[result[0]], result[2], stations_loaded[result[0]], result[2]))
         except:
             print ('could not update stations_loaded')
-    print(stations_loaded)
-    break
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Function gets weather station id, mindate and maxdate
-# Calls get_data() for each weather station's data
-# def get_meta():
-#     query = "SELECT srl.station_id, srl.station_jsonb ->> 'mindate', srl.station_jsonb ->> 'maxdate' FROM weather.stations_raw_limit srl"
-#     cur.execute(query)
-#     results = cur.fetchall()
-#     for result in results:
-        # get_data(result)
-
-
-
-
-
-# get_meta()
