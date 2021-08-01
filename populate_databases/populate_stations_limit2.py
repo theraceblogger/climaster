@@ -50,7 +50,7 @@ def add_cc(df):
 
 
 # clustering algorithm
-def cluster_stations_country(country_df):
+# def cluster_stations_country(country_df):
 
 
 
