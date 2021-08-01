@@ -29,7 +29,7 @@ def db_connect():
 cur = db_connect()
 
 
-datatypes = ['TAVG', 'TMIN', 'TMAX', 'PRCP', 'SNOW']
+# datatypes = ['TAVG', 'TMIN', 'TMAX', 'PRCP', 'SNOW']
 
 def create_table(country):
     # query = f"DROP TABLE weather.{country}_{datatype}"
@@ -60,6 +60,14 @@ def load_data(url, country, off_set=1):
     #     print(error)
     #     pass
 
+# Function gets weather station id, mindate and maxdate
+def get_meta(station):
+    query = f"SELECT srl.station_jsonb ->> 'mindate', srl.station_jsonb ->> 'maxdate' FROM weather.stations_raw_limit srl WHERE srl.station_id = {station}"
+    cur.execute(query)
+    results = cur.fetchall()
+    return results
+        
+
 
 # Set variables
 noaa_token = os.environ['noaa_token']
@@ -87,13 +95,16 @@ results = cur.fetchall()
 stations_loaded = {}
 for result in results:
     stations_loaded[result[0]] = 0
-    create_table(result[0])
+    # create_table(result[0])
     for station in result[1]:
-        url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + "1990-01-01" + end_date + "2020-12-31" + limit + offset
-        load_data(url, result[0])
-    stations_loaded[result[0]] = stations_loaded[result[0]] + 1
-    insert_sql = f"INSERT INTO weather.stations_loaded (country, stations_loaded, stations_count) VALUES (%s,%s,%s) ON CONFLICT (country) DO UPDATE SET stations_loaded = %s, stations_count = %s"
-    cur.execute(insert_sql, (result[0], stations_loaded[result[0]], result[3], stations_loaded[result[0]], result[3]))
+        meta = get_meta(station)
+        print(meta)
+    #     url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + "1990-01-01" + end_date + "2020-12-31" + limit + offset
+    #     load_data(url, result[0])
+    # stations_loaded[result[0]] = stations_loaded[result[0]] + 1
+    # insert_sql = f"INSERT INTO weather.stations_loaded (country, stations_loaded, stations_count) VALUES (%s,%s,%s) ON CONFLICT (country) DO UPDATE SET stations_loaded = %s, stations_count = %s"
+    # cur.execute(insert_sql, (result[0], stations_loaded[result[0]], result[3], stations_loaded[result[0]], result[3]))
+    break
 
 
 
@@ -119,7 +130,7 @@ def get_meta():
     cur.execute(query)
     results = cur.fetchall()
     for result in results:
-        get_data(result)
+        # get_data(result)
 
 
 # Function gets data by customizing the iterations from the metadata and calling load_data()
