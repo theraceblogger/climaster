@@ -54,7 +54,7 @@ def add_cc(df):
 def cluster_stations_country(country_df):
     coords = country_df[['latitude', 'longitude']].to_numpy()
     kms_per_radian = 6371.0088
-    epsilon = 35 / kms_per_radian
+    epsilon = 50 / kms_per_radian
     db = DBSCAN(eps=epsilon, min_samples=1, algorithm='ball_tree', metric='haversine').fit(np.radians(coords))
     cluster_labels = db.labels_
     num_clusters = len(set(cluster_labels))
@@ -123,7 +123,6 @@ def get_stations():
     stations = pd.DataFrame(flat_results)
 
     country_list = stations.cc.unique().tolist()
-    print(len(country_list))
     
     df = pd.DataFrame()
 
