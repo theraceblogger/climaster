@@ -1,5 +1,6 @@
-## This script gets stations data from weather.stations_raw database, reduces stations with a clustering algorithm (DBSCAN),
-## adds the 2 letter country code, and stores it in weather.stations_raw_limit
+## This script gets stations data from weather.stations_raw database, adds the 2 letter country code, stores it in weather.stations_raw_cc,
+## reduces stations by country with a clustering algorithm (DBSCAN), and stores it in weather.stations_raw_limit
+## Also, creates stations_by_country which lists station_id's for each country
 import os
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -50,72 +51,8 @@ def add_cc(df):
 
 
 # clustering algorithm
-# def cluster_stations_country(country_df):
-
-
-
-def get_stations():  # 14,386 stations
-    query = 'SELECT sr.station_jsonb\
-        FROM weather.stations_raw sr'
-            # WHERE (sr.station_jsonb ->> \'maxdate\')::date >= CURRENT_DATE - INTERVAL \'1 years\'\
-            #     AND (sr.station_jsonb ->> \'maxdate\')::date - INTERVAL \'30 years\' >= (sr.station_jsonb ->> \'mindate\')::date'
-    cur.execute(query)
-    results = cur.fetchall()
-    
-    flat_results = []
-    for result in results:
-        flat_results.append(result[0])
-    stations = pd.DataFrame(flat_results)
-    df = add_cc(stations)
-    country_list = df.cc.unique().tolist()
-    print(len(country_list))  # 195 countries
-
-    j = df.to_json(orient='records')
-    results = json.loads(j)
-
-    for result in results:
-        try:
-            insert_sql = "INSERT INTO weather.stations_raw_cc (station_id, station_jsonb) VALUES (%s,%s) ON CONFLICT (station_id) DO UPDATE SET station_jsonb = %s"
-            cur.execute(insert_sql, (result['id'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True))) 
-        except:
-            print ('could not iterate through results')
-    # for country in country_list:
-    #     country_df = df[df.cc == country]
-    #     print(country_df)
-    #     break
-    #     cluster_stations_country(country_df)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# clustering algorithm
-def cluster_stations(stations):    
-    coords = stations[['latitude', 'longitude']].to_numpy()
+def cluster_stations_country(country_df):
+    coords = country_df[['latitude', 'longitude']].to_numpy()
     kms_per_radian = 6371.0088
     epsilon = 35 / kms_per_radian
     db = DBSCAN(eps=epsilon, min_samples=1, algorithm='ball_tree', metric='haversine').fit(np.radians(coords))
@@ -144,54 +81,98 @@ def get_highest_coverage_station(clusters, stations):
     return points
 
 
-
-# def get_stations():
-#     query = 'SELECT sr.station_jsonb\
-#         FROM weather.stations_raw sr\
-#             WHERE (sr.station_jsonb ->> \'maxdate\')::date >= CURRENT_DATE - INTERVAL \'1 years\'\
-#                 AND (sr.station_jsonb ->> \'maxdate\')::date - INTERVAL \'30 years\' >= (sr.station_jsonb ->> \'mindate\')::date'
-#     cur.execute(query)
-#     results = cur.fetchall()
+# add country code to all stations and load into stations_raw_cc table
+def load_stations_cc():  # Limit: 14,386 stations
+    query = 'SELECT sr.station_jsonb FROM weather.stations_raw sr'
+    cur.execute(query)
+    results = cur.fetchall()
     
-#     flat_results = []
-#     for result in results:
-#         flat_results.append(result[0])
-#     stations = pd.DataFrame(flat_results)
-    
-#     clusters = cluster_stations(stations)
+    flat_results = []
+    for result in results:
+        flat_results.append(result[0])
+    stations = pd.DataFrame(flat_results)
 
-#     ## use this code to choose the station closest to the centroid
-#     # centermost_points = clusters.map(get_centermost_point)
-#     # lats, lons = zip(*centermost_points)
-#     # rep_points = pd.DataFrame({'lat':lats, 'lon':lons})
-#     # df = rep_points.apply(lambda row: stations[(stations['latitude']==row['lat']) & (stations['longitude']==row['lon'])].iloc[0], axis=1)
-    
-#     df = get_highest_coverage_station(clusters, stations)
-#     df = add_cc(df)
+    df = add_cc(stations)
 
-#     stations_by_country_dict = {}
-#     for row in df.itertuples():
-#         if row.cc not in stations_by_country_dict:
-#             stations_by_country_dict[row.cc] = [row.id]
-#         else:
-#             stations_by_country_dict[row.cc].append(row.id)
-    
-#     for country, station in stations_by_country_dict.items():
-#         try:
-#             insert_sql = "INSERT INTO weather.stations_by_country (country, stations_jsonb, stations_count) VALUES (%s,%s,%s) ON CONFLICT (country) DO UPDATE SET stations_jsonb = %s, stations_count = %s"
-#             cur.execute(insert_sql, (country, json.dumps(station, indent=4, sort_keys=True), len(station), json.dumps(station, indent=4, sort_keys=True), len(station)))
-#         except:
-#             print ('could not iterate through results')
-    
-#     j = df.to_json(orient='records')
-#     results = json.loads(j)
+    country_list = df.cc.unique().tolist()  # All: 224 countries, Limit: 195 countries
 
-#     for result in results:
-#         try:
-#             insert_sql = "INSERT INTO weather.stations_raw_limit (station_id, station_jsonb) VALUES (%s,%s) ON CONFLICT (station_id) DO UPDATE SET station_jsonb = %s"
-#             cur.execute(insert_sql, (result['id'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True))) 
-#         except:
-#             print ('could not iterate through results')
+    j = df.to_json(orient='records')
+    results = json.loads(j)
 
+    for result in results:
+        try:
+            insert_sql = "INSERT INTO weather.stations_raw_cc (station_id, station_jsonb) VALUES (%s,%s) ON CONFLICT (station_id) DO UPDATE SET station_jsonb = %s"
+            cur.execute(insert_sql, (result['id'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True))) 
+        except:
+            print ('could not iterate through results')
+    return country_list
+
+
+# country_list = load_stations_cc()
+query = 'SELECT src.station_jsonb FROM weather.stations_raw_cc src'
+cur.execute(query)
+results = cur.fetchall()
+
+flat_results = []
+for result in results:
+    flat_results.append(result[0])
+df = pd.DataFrame(flat_results)
+
+country_list = df.cc.unique().tolist()
+
+
+# main function
+def get_stations():
+    query = 'SELECT src.station_jsonb\
+        FROM weather.stations_raw_cc src\
+            WHERE (src.station_jsonb ->> \'maxdate\')::date >= CURRENT_DATE - INTERVAL \'1 years\'\
+                AND (src.station_jsonb ->> \'maxdate\')::date - INTERVAL \'30 years\' >= (src.station_jsonb ->> \'mindate\')::date'
+    cur.execute(query)
+    results = cur.fetchall()
+    
+    flat_results = []
+    for result in results:
+        flat_results.append(result[0])
+    stations = pd.DataFrame(flat_results)
+    
+    df = pd.DataFrame()
+
+    for country in country_list:
+        country_df = stations[stations.cc == country]
+        clusters = cluster_stations_country(country_df)
+
+        ## use this code to choose the station closest to the centroid
+        # centermost_points = clusters.map(get_centermost_point)
+        # lats, lons = zip(*centermost_points)
+        # rep_points = pd.DataFrame({'lat':lats, 'lon':lons})
+        # df = rep_points.apply(lambda row: stations[(stations['latitude']==row['lat']) & (stations['longitude']==row['lon'])].iloc[0], axis=1)
+
+        cluster_df = get_highest_coverage_station(clusters, country_df)
+        df = pd.concat(df, cluster_df, ignore_index=True)
+
+    stations_by_country_dict = {}
+    for row in df.itertuples():
+        if row.cc not in stations_by_country_dict:
+        stations_by_country_dict[row.cc] = [row.id]
+    else:
+        stations_by_country_dict[row.cc].append(row.id)
+    
+    for country, station in stations_by_country_dict.items():
+        try:
+            insert_sql = "INSERT INTO weather.stations_by_country (country, stations_jsonb, stations_count) VALUES (%s,%s,%s) ON CONFLICT (country) DO UPDATE SET stations_jsonb = %s, stations_count = %s"
+            cur.execute(insert_sql, (country, json.dumps(station, indent=4, sort_keys=True), len(station), json.dumps(station, indent=4, sort_keys=True), len(station)))
+        except:
+            print ('could not iterate through results')
+    
+    
+    j = df.to_json(orient='records')
+    results = json.loads(j)
+
+    for result in results:
+        try:
+            insert_sql = "INSERT INTO weather.stations_raw_limit (station_id, station_jsonb) VALUES (%s,%s) ON CONFLICT (station_id) DO UPDATE SET station_jsonb = %s"
+            cur.execute(insert_sql, (result['id'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True))) 
+        except:
+            print ('could not iterate through results')
 
 get_stations()
