@@ -111,8 +111,12 @@ query = "SELECT country, stations_loaded, stations_count FROM weather.stations_l
 cur.execute(query)
 loaded = cur.fetchall()
 
-c = len(loaded) - 1  # index of country
-s = loaded[0][1]  # index of station
+if len(loaded) == 0:
+    c = 0
+    s = 0
+else:
+    c = len(loaded) - 1  # index of country
+    s = loaded[0][1]  # index of station
 
 for i in range(c, len(results)):
     result = results[i]
