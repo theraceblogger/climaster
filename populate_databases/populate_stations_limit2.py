@@ -134,12 +134,12 @@ def get_stations():
         clusters = cluster_stations_country(country_df)
 
         ## use this code to choose the station closest to the centroid
-        # centermost_points = clusters.map(get_centermost_point)
-        # lats, lons = zip(*centermost_points)
-        # rep_points = pd.DataFrame({'lat':lats, 'lon':lons})
-        # df = rep_points.apply(lambda row: stations[(stations['latitude']==row['lat']) & (stations['longitude']==row['lon'])].iloc[0], axis=1)
+        centermost_points = clusters.map(get_centermost_point)
+        lats, lons = zip(*centermost_points)
+        rep_points = pd.DataFrame({'lat':lats, 'lon':lons})
+        country_df = rep_points.apply(lambda row: country_df[(country_df['latitude']==row['lat']) & (country_df['longitude']==row['lon'])].iloc[0], axis=1)
 
-        country_df = get_highest_coverage_station(clusters, country_df)
+        # country_df = get_highest_coverage_station(clusters, country_df)
         df = pd.concat([df, country_df], ignore_index=True)
 
     stations_by_country_dict = {}
