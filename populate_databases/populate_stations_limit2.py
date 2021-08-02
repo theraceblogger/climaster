@@ -54,7 +54,7 @@ def add_cc(df):
 def cluster_stations_country(country_df):
     coords = country_df[['latitude', 'longitude']].to_numpy()
     kms_per_radian = 6371.0088
-    epsilon = 100 / kms_per_radian
+    epsilon = 75 / kms_per_radian
     db = DBSCAN(eps=epsilon, min_samples=1, algorithm='ball_tree', metric='haversine').fit(np.radians(coords))
     cluster_labels = db.labels_
     num_clusters = len(set(cluster_labels))
@@ -128,18 +128,18 @@ def get_stations():
 
     for country in country_list:
         country_df = stations[stations.cc == country]
-        if len(country_df) < 10:
+        if len(country_df) <= 5:
             df = pd.concat([df, country_df], ignore_index=True)
             continue
         clusters = cluster_stations_country(country_df)
 
         ## use this code to choose the station closest to the centroid
-        centermost_points = clusters.map(get_centermost_point)
-        lats, lons = zip(*centermost_points)
-        rep_points = pd.DataFrame({'lat':lats, 'lon':lons})
-        country_df = rep_points.apply(lambda row: country_df[(country_df['latitude']==row['lat']) & (country_df['longitude']==row['lon'])].iloc[0], axis=1)
+        # centermost_points = clusters.map(get_centermost_point)
+        # lats, lons = zip(*centermost_points)
+        # rep_points = pd.DataFrame({'lat':lats, 'lon':lons})
+        # country_df = rep_points.apply(lambda row: country_df[(country_df['latitude']==row['lat']) & (country_df['longitude']==row['lon'])].iloc[0], axis=1)
 
-        # country_df = get_highest_coverage_station(clusters, country_df)
+        country_df = get_highest_coverage_station(clusters, country_df)
         df = pd.concat([df, country_df], ignore_index=True)
 
     stations_by_country_dict = {}
