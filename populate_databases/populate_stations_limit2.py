@@ -128,9 +128,9 @@ def get_stations():
 
     for country in country_list:
         country_df = stations[stations.cc == country]
-        if len(country_df) <= 5:
-            df = pd.concat([df, country_df], ignore_index=True)
-            continue
+        # if len(country_df) <= 5:
+        #     df = pd.concat([df, country_df], ignore_index=True)
+        #     continue
         clusters = cluster_stations_country(country_df)
 
         ## use this code to choose the station closest to the centroid

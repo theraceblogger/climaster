@@ -1,0 +1,5 @@
+.DS_Store
+plot_data/10m_physical/
+plot_data/gadm36_shp/
+*.png
+plot_data/us_shapefiles/

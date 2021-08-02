@@ -80,7 +80,7 @@ def get_highest_coverage_station(clusters, stations):
     return points
 
 
-
+# main function
 def get_stations():
     query = 'SELECT sr.station_jsonb\
         FROM weather.stations_raw sr\
