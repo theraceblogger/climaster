@@ -48,6 +48,13 @@ def cluster_stations(stations):
     return clusters
 
 
+# choose point in cluster closest to centroid
+def get_centermost_point(cluster):
+    centroid = (MultiPoint(cluster).centroid.x, MultiPoint(cluster).centroid.y)
+    centermost_point = min(cluster, key=lambda point: great_circle(point, centroid).m)
+    return tuple(centermost_point)
+
+
 # choose point in cluster with highest coverage
 def get_highest_coverage_station(clusters, stations):
     points = pd.DataFrame()
@@ -77,7 +84,13 @@ def get_stations():
 
     clusters = cluster_stations(stations)
 
-    df = get_highest_coverage_station(clusters, stations)
+    ## use this code to choose the station closest to the centroid
+    centermost_points = clusters.map(get_centermost_point)
+    lats, lons = zip(*centermost_points)
+    rep_points = pd.DataFrame({'lat':lats, 'lon':lons})
+    df = rep_points.apply(lambda row: stations[(stations['latitude']==row['lat']) & (stations['longitude']==row['lon'])].iloc[0], axis=1)
+    
+    # df = get_highest_coverage_station(clusters, stations)
 
 
     df.to_csv('/home/ec2-user/climaster/stations_limit_us.csv', index=False)
