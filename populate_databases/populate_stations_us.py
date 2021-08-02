@@ -40,8 +40,8 @@ cur = db_connect()
 def cluster_stations(stations):
     coords = stations[['latitude', 'longitude']].to_numpy()
     kms_per_radian = 6371.0088
-    epsilon = 42 / kms_per_radian
-    db = DBSCAN(eps=epsilon, min_samples=1, algorithm='brute', metric='haversine').fit(np.radians(coords))
+    epsilon = 45 / kms_per_radian
+    db = DBSCAN(eps=epsilon, min_samples=1, algorithm='ball_tree', metric='haversine').fit(np.radians(coords))
     cluster_labels = db.labels_
     num_clusters = len(set(cluster_labels))
     clusters = pd.Series([coords[cluster_labels == n] for n in range(num_clusters)])
