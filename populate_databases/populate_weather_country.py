@@ -107,15 +107,21 @@ query = "SELECT country, stations_jsonb, stations_count FROM weather.stations_by
 cur.execute(query)
 results = cur.fetchall()
 
-for result in results:  # for country in table (entire row)
-    stations_loaded = 0
-    create_table(result[0])  # create table for country
-    for station in result[1]:  # for station in country
-        get_data(station, result[0])  # get station data and load
-        stations_loaded += 1
-        try:  # update number of stations_loaded by country
-            insert_sql = "INSERT INTO weather.stations_loaded (country, stations_loaded, stations_count) VALUES (%s,%s,%s) ON CONFLICT (country) DO UPDATE SET stations_loaded = %s, stations_count = %s"
-            cur.execute(insert_sql, (result[0], stations_loaded, result[2], stations_loaded, result[2]))
-        except:
-            print ('could not update stations_loaded')
+query = "SELECT country, stations_loaded, stations_count FROM weather.stations_loaded"
+cur.execute(query)
+loaded = cur.fetchall()
+
+print(loaded)
+
+# for result in results:  # for country in table (entire row)
+#     stations_loaded = 0
+#     create_table(result[0])  # create table for country
+#     for station in result[1]:  # for station in country
+#         get_data(station, result[0])  # get station data and load
+#         stations_loaded += 1
+#         try:  # update number of stations_loaded by country
+#             insert_sql = "INSERT INTO weather.stations_loaded (country, stations_loaded, stations_count) VALUES (%s,%s,%s) ON CONFLICT (country) DO UPDATE SET stations_loaded = %s, stations_count = %s"
+#             cur.execute(insert_sql, (result[0], stations_loaded, result[2], stations_loaded, result[2]))
+#         except:
+#             print ('could not update stations_loaded')
 
