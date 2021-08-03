@@ -33,10 +33,10 @@ def db_connect():
 cur = db_connect()
 
 # clustering algorithm
-def cluster_stations_country(country_df):
-    coords = country_df[['latitude', 'longitude']].to_numpy()
+def cluster_stations(df, radius):
+    coords = df[['latitude', 'longitude']].to_numpy()
     kms_per_radian = 6371.0088
-    epsilon = 50 / kms_per_radian
+    epsilon = radius / kms_per_radian
     db = DBSCAN(eps=epsilon, min_samples=1, algorithm='ball_tree', metric='haversine').fit(np.radians(coords))
     cluster_labels = db.labels_
     num_clusters = len(set(cluster_labels))
@@ -51,6 +51,18 @@ def get_centermost_point(cluster):
     return tuple(centermost_point)
 
 
+# choose point in cluster with highest coverage
+def get_highest_coverage_station(clusters, stations):
+    points = pd.DataFrame()
+    for cluster in clusters:
+        lats, lons = zip(*cluster)
+        cluster_df = pd.DataFrame({'lat':lats, 'lon':lons})
+        cluster_df = cluster_df.apply(lambda row: stations[(stations['latitude']==row['lat']) & (stations['longitude']==row['lon'])].iloc[0], axis=1)
+        chosen = cluster_df[cluster_df.datacoverage == cluster_df.datacoverage.max()]
+        points = points.append(chosen.head(1), ignore_index=True, sort=False)
+    return points
+
+
 query = "SELECT sr.station_jsonb\
     FROM weather.stations_raw sr\
         WHERE (sr.station_jsonb ->> 'maxdate')::date >= CURRENT_DATE - INTERVAL '1 years'\
@@ -61,6 +73,34 @@ results = cur.fetchall()
 flat_results = []
 for result in results:
     flat_results.append(result[0])
-
 df = pd.DataFrame(flat_results)
-df.to_csv('/home/ec2-user/climaster/stations_world.csv', index=False)
+
+print(f"Original number of stations: {len(df)}")
+radii = [5, 25, 50, 75]
+for iteration, radius in enumerate(radii):
+    clusters = cluster_stations(df, radius)
+    print(f"Number of stations after {iteration + 1} iteration(s): {len(clusters)}")
+    if iteration < 2:
+        df = get_highest_coverage_station(clusters, df)
+    else:
+        centermost_points = clusters.map(get_centermost_point)
+        lats, lons = zip(*centermost_points)
+        rep_points = pd.DataFrame({'lat':lats, 'lon':lons})
+        df = rep_points.apply(lambda row: df[(df['latitude']==row['lat']) & (df['longitude']==row['lon'])].iloc[0], axis=1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+df.to_csv('/home/ec2-user/climaster/stations_world_reduce.csv', index=False)
