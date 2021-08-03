@@ -76,7 +76,7 @@ for result in results:
 df = pd.DataFrame(flat_results)
 
 print(f"Original number of stations: {len(df)}")
-radii = [5, 25, 50, 75]
+radii = [5, 25, 50, 75, 100]
 for iteration, radius in enumerate(radii):
     clusters = cluster_stations(df, radius)
     print(f"Number of stations after {iteration + 1} iteration(s): {len(clusters)}")
