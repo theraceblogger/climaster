@@ -82,7 +82,7 @@ radii = [5, 25, 50, 75, 100, 150, 200, 250, 350, 500]
 for iteration, radius in enumerate(radii):
     clusters = cluster_stations(df, radius)
     print(f"Number of stations after {iteration + 1} iteration(s): {len(clusters)}")
-    if iteration < 3:
+    if iteration < 10:
         df = get_highest_coverage_station(clusters, df)
         avg = df.datacoverage.mean()
         print(f"Average data coverage: {avg}")
@@ -92,7 +92,7 @@ for iteration, radius in enumerate(radii):
         rep_points = pd.DataFrame({'lat':lats, 'lon':lons})
         df = rep_points.apply(lambda row: df[(df['latitude']==row['lat']) & (df['longitude']==row['lon'])].iloc[0], axis=1)
         avg = df.datacoverage.mean()
-        print(f"Average data coverage: {avg}")
+        print(f"average data coverage: {avg}")
 
 
 
