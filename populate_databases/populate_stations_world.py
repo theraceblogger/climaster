@@ -44,6 +44,13 @@ def cluster_stations(df, radius):
     return clusters
 
 
+# choose point in cluster closest to centroid
+def get_centermost_point(cluster):
+    centroid = (MultiPoint(cluster).centroid.x, MultiPoint(cluster).centroid.y)
+    centermost_point = min(cluster, key=lambda point: great_circle(point, centroid).m)
+    return tuple(centermost_point)
+
+
 # choose point in cluster with highest coverage
 def get_highest_coverage_station(clusters, stations):
     points = pd.DataFrame()
@@ -71,14 +78,21 @@ df = pd.DataFrame(flat_results)
 print(f"Original number of stations: {len(df)}")
 avg = df.datacoverage.mean()
 print(f"Average data coverage: {avg}")
-radii = [10, 25, 50, 75, 100, 150, 200, 250, 350, 500]
+radii = [5, 25, 50, 75, 100, 150, 200, 250, 350, 500]
 for iteration, radius in enumerate(radii):
     clusters = cluster_stations(df, radius)
-    df = get_highest_coverage_station(clusters, df)
-    print(f"Number of stations after {iteration + 1} iteration(s): {len(df)}")
-    avg = df.datacoverage.mean()
-    print(f"Average data coverage: {avg}")
-
+    print(f"Number of stations after {iteration + 1} iteration(s): {len(clusters)}")
+    if iteration < 10:
+        df = get_highest_coverage_station(clusters, df)
+        avg = df.datacoverage.mean()
+        print(f"Average data coverage: {avg}")
+    else:
+        centermost_points = clusters.map(get_centermost_point)
+        lats, lons = zip(*centermost_points)
+        rep_points = pd.DataFrame({'lat':lats, 'lon':lons})
+        df = rep_points.apply(lambda row: df[(df['latitude']==row['lat']) & (df['longitude']==row['lon'])].iloc[0], axis=1)
+        avg = df.datacoverage.mean()
+        print(f"Average data coverage: {avg}")
 
 
 
