@@ -54,8 +54,7 @@ def get_centermost_point(cluster):
 query = "SELECT sr.station_jsonb\
     FROM weather.stations_raw sr\
         WHERE (sr.station_jsonb ->> 'maxdate')::date >= CURRENT_DATE - INTERVAL '1 years'\
-            AND (sr.station_jsonb ->> 'maxdate')::date - INTERVAL '30 years' >= (sr.station_jsonb ->> 'mindate')::date\
-                AND (sr.station_jsonb ->> 'datacoverage')::DECIMAL = 1"
+            AND (sr.station_jsonb ->> 'maxdate')::date - INTERVAL '30 years' >= (sr.station_jsonb ->> 'mindate')::date"
 cur.execute(query)
 results = cur.fetchall()
 
