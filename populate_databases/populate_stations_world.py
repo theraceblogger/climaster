@@ -78,7 +78,7 @@ df = pd.DataFrame(flat_results)
 print(f"Original number of stations: {len(df)}")
 avg = df.datacoverage.mean()
 print(f"Average data coverage: {avg}")
-radii = [5, 25, 50, 75, 100, 150, 200, 250, 350]
+radii = [5, 25, 50, 75, 100, 150, 200, 250, 350, 500]
 for iteration, radius in enumerate(radii):
     clusters = cluster_stations(df, radius)
     print(f"Number of stations after {iteration + 1} iteration(s): {len(clusters)}")
