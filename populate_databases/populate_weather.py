@@ -101,20 +101,21 @@ results = cur.fetchall()
 stations = []
 for result in results:
     stations.append(result[0])
-
+print(stations)
 # get number of stations loaded for index
 query = "SELECT COUNT(*) FROM weather.stations_loaded"
 cur.execute(query)
 count = cur.fetchall()
+print(count)
 begin_index = count[0]
 
 # get weather data and load into table weather_raw
-for i in range(begin_index, len(stations)):
-    station = stations[i]
-    get_data(station)
-    # update stations_loaded
-    try:
-        insert_sql = "INSERT INTO weather.stations_loaded (station_id) VALUES (%s) ON CONFLICT (station_id) DO UPDATE SET station_id = %s"
-        cur.execute(insert_sql, (station, station))
-    except:
-        print ('could not update stations_loaded')
+# for i in range(begin_index, len(stations)):
+#     station = stations[i]
+#     get_data(station)
+#     # update stations_loaded
+#     try:
+#         insert_sql = "INSERT INTO weather.stations_loaded (station_id) VALUES (%s) ON CONFLICT (station_id) DO UPDATE SET station_id = %s"
+#         cur.execute(insert_sql, (station, station))
+#     except:
+#         print ('could not update stations_loaded')
