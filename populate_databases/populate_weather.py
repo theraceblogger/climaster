@@ -45,7 +45,7 @@ offset = "&offset="
 
 # Function gets data by customizing the iterations from the metadata and calling load_data()
 def get_data(station):
-    query = f"SELECT sw.station_id, sw.station_jsonb ->> 'mindate', sw.station_jsonb ->> 'maxdate' FROM weather.stations_world sw WHERE sw.station_id = '{station}'"
+    query = f"SELECT sw.station_jsonb ->> 'mindate', sw.station_jsonb ->> 'maxdate' FROM weather.stations_world sw WHERE sw.station_id = '{station}'"
     cur.execute(query)
     meta = cur.fetchall()
     start, end = meta[0][0], meta[0][1]
