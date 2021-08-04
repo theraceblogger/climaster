@@ -99,8 +99,8 @@ cur.execute(query)
 results = cur.fetchall()
 
 stations = []
-    for result in results:
-        stations.append(result[0])
+for result in results:
+    stations.append(result[0])
 
 # get number of stations loaded for index
 query = "SELECT COUNT(*) FROM weather.stations_loaded"
