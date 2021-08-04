@@ -1,4 +1,4 @@
-## This script gets data from EMDAT and loads it into weather.emdat_raw
+## This script gets data from EMDAT and loads it into disasters_raw
 import os
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -136,7 +136,7 @@ def get_disasters():
     
     for result in results['data']:
         try:
-            insert_sql = "INSERT INTO weather.emdat_raw (disaster_no, emdat_jsonb) VALUES (%s,%s) ON CONFLICT (disaster_no) DO UPDATE SET emdat_jsonb = %s"
+            insert_sql = "INSERT INTO weather.disasters_raw (disaster_no, disaster_jsonb) VALUES (%s,%s) ON CONFLICT (disaster_no) DO UPDATE SET disaster_jsonb = %s"
             cur.execute(insert_sql, (result['Dis No'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True)))
         except:
             print ('could not iterate through results')
