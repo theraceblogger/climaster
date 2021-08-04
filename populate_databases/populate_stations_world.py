@@ -1,15 +1,17 @@
-## This script gets data from NOAA, and stores it in weather.noaa_raw
+## This script gets station data from stations_raw, selects current stations (within 1 year) with at least 30 years of data,
+## uses a clustering algorithm to spatially reduce the stations to 1 per 500 km radius, adds the two letter country code,
+## and stores the stations in stations_world
 import os
 import psycopg2
 from psycopg2.extras import DictCursor
 import requests
 import json
-import time
 import pandas as pd
 import numpy as np
 from sklearn.cluster import DBSCAN
 from geopy.distance import great_circle
 from shapely.geometry import MultiPoint
+import reverse_geocoder
 
 
 # Function that connects to database
@@ -31,6 +33,21 @@ def db_connect():
     return cur
 
 cur = db_connect()
+
+
+# add country code to dataframe
+def add_cc(df):
+    country = []
+    lats = df.latitude.to_list()
+    lons = df.longitude.to_list()
+    coords = list(zip(lats, lons))
+
+    for i in range(len(coords)):
+        location = reverse_geocoder.search(coords[i])
+        country.append(location[0]['cc'])
+    df['cc'] = country
+    return df
+
 
 # clustering algorithm
 def cluster_stations(df, radius):
@@ -75,38 +92,22 @@ for result in results:
     flat_results.append(result[0])
 df = pd.DataFrame(flat_results)
 
-print(f"Original number of stations: {len(df)}")
-avg = df.datacoverage.mean()
-print(f"Average data coverage: {avg}")
 radii = [5, 25, 50, 75, 100, 150, 200, 250, 350, 500]
-for iteration, radius in enumerate(radii):
+for radius in radii:
     clusters = cluster_stations(df, radius)
-    print(f"Number of stations after {iteration + 1} iteration(s): {len(clusters)}")
-    if iteration < 10:
-        df = get_highest_coverage_station(clusters, df)
-        avg = df.datacoverage.mean()
-        print(f"Average data coverage: {avg}")
-    else:
-        centermost_points = clusters.map(get_centermost_point)
-        lats, lons = zip(*centermost_points)
-        rep_points = pd.DataFrame({'lat':lats, 'lon':lons})
-        df = rep_points.apply(lambda row: df[(df['latitude']==row['lat']) & (df['longitude']==row['lon'])].iloc[0], axis=1)
-        avg = df.datacoverage.mean()
-        print(f"Average data coverage: {avg}")
+    df = get_highest_coverage_station(clusters, df)
+
+df = add_cc(df)
+
+j = df.to_json(orient='records')
+results = json.loads(j)
+
+for result in results:
+    try:
+        insert_sql = "INSERT INTO weather.stations_world (station_id, station_jsonb) VALUES (%s,%s) ON CONFLICT (station_id) DO UPDATE SET station_jsonb = %s"
+        cur.execute(insert_sql, (result['id'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True))) 
+    except:
+        print ('could not iterate through results')
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-df.to_csv('/home/ec2-user/climaster/stations_world_reduce.csv', index=False)
