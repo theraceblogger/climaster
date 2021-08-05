@@ -47,17 +47,17 @@ for field in fields:
 
 df = reduce(lambda  left,right: pd.merge(left,right,on=['date'], how='outer'), dataframes)
 df['TAVG'] = df[['TMIN', 'TMAX']].mean(axis=1)
-print(df.head())
-# j = df.to_json(orient='records')
-# results = json.loads(j)
 
-# for result in results:
-#     try:
-#         insert_sql = "INSERT INTO weather.weather_daily (date, tmin, tmax, tavg, prcp, snow, snwd)\
-#             VALUES (%s,%s,%s,%s,%s,%s,%s)\
-#                 ON CONFLICT (date)\
-#                     DO UPDATE SET tmin = %s, tmax = %s, tavg = %s, prcp = %s, snow = %s, snwd = %s"
-#         cur.execute(insert_sql, (result['date'], result['tmin'], result['tmax'], result['tavg'], result['prcp'], result['snow'],\
-#             result['snwd'], result['tmin'], result['tmax'], result['tavg'], result['prcp'], result['snow'], result['snwd']))
-#     except:
-#         print ('could not iterate through results')
+j = df.to_json(orient='records')
+results = json.loads(j)
+
+for result in results:
+    try:
+        insert_sql = "INSERT INTO weather.weather_clean (date, tmin, tmax, tavg, prcp, snow, snwd)\
+            VALUES (%s,%s,%s,%s,%s,%s,%s)\
+                ON CONFLICT (date)\
+                    DO UPDATE SET tmin = %s, tmax = %s, tavg = %s, prcp = %s, snow = %s, snwd = %s"
+        cur.execute(insert_sql, (result['date'], result['TMIN'], result['TMAX'], result['TAVG'], result['PRCP'], result['SNOW'],\
+            result['SNWD'], result['TMIN'], result['TMAX'], result['TAVG'], result['PRCP'], result['SNOW'], result['SNWD']))
+    except:
+        print ('could not iterate through results')
