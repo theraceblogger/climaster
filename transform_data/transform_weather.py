@@ -38,11 +38,11 @@ for field in fields:
     cur.execute(query)
     results = cur.fetchall()
     # print(results[:5])
-#     flat_results = []
-#     for result in results:
-#         flat_results.append(result[0])
-#     field = pd.DataFrame(flat_results)
-      print(field.head())
+    flat_results = []
+    for result in results:
+        flat_results.append(result[0])
+    field = pd.DataFrame(flat_results)
+    print(field.head())
 #     dataframes.append(field)
 # for x in dataframes:
 #     print(x.head())
