@@ -41,7 +41,7 @@ for field in fields:
     flat_results = []
     for result in results:
         flat_results.append(result)
-    field = pd.DataFrame(flat_results)
+    field = pd.DataFrame(flat_results, columns=['date', field])
     
     dataframes.append(field)
 # for x in dataframes:
