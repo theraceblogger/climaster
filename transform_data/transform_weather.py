@@ -54,7 +54,7 @@ j = df.to_json(orient='records', date_format='iso')
 results = json.loads(j)
 counter = 0
 for result in results:
-    print(result)
+    print(result[0][:10])
     break
     counter += 1
     if counter == 5:
