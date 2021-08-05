@@ -43,10 +43,12 @@ for field in fields:
         flat_results.append(result[0])
     field = pd.DataFrame(flat_results)
     dataframes.append(field)
+for x in dataframes:
+    print(x.head())
 
-df = reduce(lambda  left,right: pd.merge(left,right,on=['date'], how='outer'), dataframes)
-df['tavg'] = df[['tmin', 'tmax']].mean(axis=1)
-print(df.head(10))
+# df = reduce(lambda  left,right: pd.merge(left,right,on=['date'], how='outer'), dataframes)
+# df['tavg'] = df[['tmin', 'tmax']].mean(axis=1)
+# print(df.head(10))
 # j = df.to_json(orient='records')
 # results = json.loads(j)
 
