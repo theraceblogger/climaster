@@ -54,7 +54,7 @@ def add_cc(df):
     return df
 
 
-query = "SELECT dr.disaster_jsonb FROM weather.disaster_raw dr ORDER BY dr.disaster_jsonb ->> 'Year', dr.disaster_jsonb ->> 'Month', dr.disaster_jsonb ->> 'Day'"
+query = "SELECT dr.disaster_jsonb FROM weather.disasters_raw dr ORDER BY dr.disaster_jsonb ->> 'Year', dr.disaster_jsonb ->> 'Month', dr.disaster_jsonb ->> 'Day'"
 cur.execute(query)
 results = cur.fetchall()
 
