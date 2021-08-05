@@ -30,7 +30,7 @@ cur = db_connect()
 fields = ['TMIN', 'TMAX', 'PRCP', 'SNOW', 'SNWD']
 dataframes = []
 for field in fields:
-    query = f"SELECT (wr.date)::date, AVG((wr.weather_jsonb ->> 'value')::decimal) {field}\
+    query = f"SELECT (wr.date)::date date, AVG((wr.weather_jsonb ->> 'value')::decimal) {field}\
         FROM weather.weather_raw wr\
             WHERE wr.datatype = '{field}'\
                 GROUP BY wr.date\
