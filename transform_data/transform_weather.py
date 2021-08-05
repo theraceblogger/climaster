@@ -40,8 +40,8 @@ for field in fields:
     # print(results[:5])
     flat_results = []
     for result in results:
-        print(result)
-    #     flat_results.append(result[0])
+        flat_results.append([result[0], result[1]])
+    print(flat_results[:5])
     # field = pd.DataFrame(flat_results)
     # print(field.head())
 #     dataframes.append(field)
