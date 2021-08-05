@@ -48,23 +48,23 @@ for field in fields:
 df = reduce(lambda  left,right: pd.merge(left,right,on=['date'], how='outer'), dataframes)
 df['TAVG'] = df[['TMIN', 'TMAX']].mean(axis=1)
 # print(df.head())
-df.update(df.select_dtypes('datetime').apply(lambda x: x.dt.strftime('%Y-%m-%d')))
+# df.update(df.select_dtypes('datetime').apply(lambda x: x.dt.strftime('%Y-%m-%d')))
 j = df.to_json(orient='records', date_format='iso')
 
 results = json.loads(j)
-counter = 0
+# counter = 0
 for result in results:
-    print(result['date'][:10])
-    break
-    counter += 1
-    if counter == 5:
-        break
-    # try:
-    #     insert_sql = "INSERT INTO weather.weather_clean (date, tmin, tmax, tavg, prcp, snow, snwd)\
-    #         VALUES (%s,%s,%s,%s,%s,%s,%s)\
-    #             ON CONFLICT (date)\
-    #                 DO UPDATE SET tmin = %s, tmax = %s, tavg = %s, prcp = %s, snow = %s, snwd = %s"
-    #     cur.execute(insert_sql, (result['date'], result['TMIN'], result['TMAX'], result['TAVG'], result['PRCP'], result['SNOW'],\
-    #         result['SNWD'], result['TMIN'], result['TMAX'], result['TAVG'], result['PRCP'], result['SNOW'], result['SNWD']))
-    # except:
-    #     print ('could not iterate through results')
+    # print(result['date'][:10])
+    # break
+    # counter += 1
+    # if counter == 5:
+    #     break
+    try:
+        insert_sql = "INSERT INTO weather.weather_clean (date, tmin, tmax, tavg, prcp, snow, snwd)\
+            VALUES (%s,%s,%s,%s,%s,%s,%s)\
+                ON CONFLICT (date)\
+                    DO UPDATE SET tmin = %s, tmax = %s, tavg = %s, prcp = %s, snow = %s, snwd = %s"
+        cur.execute(insert_sql, (result['date'][:10], result['TMIN'], result['TMAX'], result['TAVG'], result['PRCP'], result['SNOW'],\
+            result['SNWD'], result['TMIN'], result['TMAX'], result['TAVG'], result['PRCP'], result['SNOW'], result['SNWD']))
+    except:
+        print ('could not iterate through results')
