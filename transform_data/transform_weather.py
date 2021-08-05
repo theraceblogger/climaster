@@ -37,15 +37,14 @@ for field in fields:
                     ORDER BY wr.date"
     cur.execute(query)
     results = cur.fetchall()
-    # print(results[:5])
+
     flat_results = []
     for result in results:
-        print(result)
-        break
-    #     flat_results.append(result[0], result[1])
+        flat_results.append(result)
     # print(flat_results[:5])
-    # field = pd.DataFrame(flat_results)
-    # print(field.head())
+    field = pd.DataFrame(flat_results)
+    print(field.head())
+    break
 #     dataframes.append(field)
 # for x in dataframes:
 #     print(x.head())
