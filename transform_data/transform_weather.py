@@ -28,6 +28,7 @@ def db_connect():
 cur = db_connect()
 
 fields = ['TMIN', 'TMAX', 'PRCP', 'SNOW', 'SNWD']
+dataframes = []
 for field in fields:
     query = f"SELECT (wr.date)::date, AVG((wr.weather_jsonb ->> 'value')::decimal) {field}\
         FROM weather.weather_raw wr\
@@ -41,8 +42,9 @@ for field in fields:
     for result in results:
         flat_results.append(result[0])
     field = pd.DataFrame(flat_results)
+    dataframes.append(field)
 
-df = reduce(lambda  left,right: pd.merge(left,right,on=['date'], how='outer'), fields)
+df = reduce(lambda  left,right: pd.merge(left,right,on=['date'], how='outer'), dataframes)
 df['tavg'] = df[['tmin', 'tmax']].mean(axis=1)
 print(df.head(10))
 # j = df.to_json(orient='records')
