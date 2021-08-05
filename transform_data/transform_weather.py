@@ -47,15 +47,15 @@ for field in fields:
 
 df = reduce(lambda  left,right: pd.merge(left,right,on=['date'], how='outer'), dataframes)
 df['TAVG'] = df[['TMIN', 'TMAX']].mean(axis=1)
-
-j = df.to_json(orient='records')
-results = json.loads(j)
-counter = 0
-for result in results:
-    print(result)
-    counter += 1
-    if counter == 5:
-        break
+print(df.head())
+# j = df.to_json(orient='records')
+# results = json.loads(j)
+# counter = 0
+# for result in results:
+#     print(result)
+#     counter += 1
+#     if counter == 5:
+#         break
     # try:
     #     insert_sql = "INSERT INTO weather.weather_clean (date, tmin, tmax, tavg, prcp, snow, snwd)\
     #         VALUES (%s,%s,%s,%s,%s,%s,%s)\
