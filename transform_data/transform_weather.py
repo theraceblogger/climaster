@@ -27,6 +27,8 @@ def db_connect():
 
 cur = db_connect()
 
+
+# get averages for each field, store in DataFrame
 fields = ['TMIN', 'TMAX', 'PRCP', 'SNOW', 'SNWD']
 dataframes = []
 for field in fields:
@@ -41,24 +43,21 @@ for field in fields:
     flat_results = []
     for result in results:
         flat_results.append(result)
-    field = pd.DataFrame(flat_results, columns=['date', field])
     
+    field = pd.DataFrame(flat_results, columns=['date', field])
     dataframes.append(field)
 
+
+# outer join field DataFrames, add TAVG
 df = reduce(lambda  left,right: pd.merge(left,right,on=['date'], how='outer'), dataframes)
 df['TAVG'] = df[['TMIN', 'TMAX']].mean(axis=1)
-# print(df.head())
-# df.update(df.select_dtypes('datetime').apply(lambda x: x.dt.strftime('%Y-%m-%d')))
-j = df.to_json(orient='records', date_format='iso')
 
+
+# load results into weather_clean
+j = df.to_json(orient='records', date_format='iso')
 results = json.loads(j)
-# counter = 0
+
 for result in results:
-    # print(result['date'][:10])
-    # break
-    # counter += 1
-    # if counter == 5:
-    #     break
     try:
         insert_sql = "INSERT INTO weather.weather_clean (date, tmin, tmax, tavg, prcp, snow, snwd)\
             VALUES (%s,%s,%s,%s,%s,%s,%s)\
