@@ -1,3 +1,5 @@
+## This script takes the data in weather_raw, averages each datatype per day,
+## adds a daily average and stores this in weather_clean
 import os
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -28,7 +30,7 @@ def db_connect():
 cur = db_connect()
 
 
-# get averages for each field, store in DataFrame
+# get averages for each field, per day, and store in DataFrame
 fields = ['TMIN', 'TMAX', 'PRCP', 'SNOW', 'SNWD']
 dataframes = []
 for field in fields:
