@@ -27,11 +27,11 @@ def db_connect():
 
 cur = db_connect()
 
-fields = ['tmin', 'tmax', 'prcp', 'snow', 'snwd']
+fields = ['TMIN', 'TMAX', 'PRCP', 'SNOW', 'SNWD']
 for field in fields:
     query = f"SELECT (wr.date)::date, AVG((wr.weather_jsonb ->> 'value')::decimal) {field}\
         FROM weather.weather_raw wr\
-            WHERE wr.datatype = {field}\
+            WHERE wr.datatype = '{field}'\
                 GROUP BY wr.date\
                     ORDER BY wr.date"
     cur.execute(query)
