@@ -54,7 +54,7 @@ counter = 0
 for result in results:
     print(result)
     counter += 1
-    if counter = 5:
+    if counter == 5:
         break
     # try:
     #     insert_sql = "INSERT INTO weather.weather_clean (date, tmin, tmax, tavg, prcp, snow, snwd)\
