@@ -48,7 +48,7 @@ for field in fields:
 df = reduce(lambda  left,right: pd.merge(left,right,on=['date'], how='outer'), dataframes)
 df['TAVG'] = df[['TMIN', 'TMAX']].mean(axis=1)
 
-j = df.to_json(orient='index')
+j = df.to_json(orient='split')
 results = json.loads(j)
 
 for result in results:
