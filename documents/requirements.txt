@@ -10,3 +10,5 @@ pip3 install openpyxl
 pip3 install geopy
 pip3 install shapely
 pip3 install reverse_geocoder
+pip3 install pycountry
+pip3 install pycountry_convert
