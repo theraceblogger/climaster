@@ -79,7 +79,7 @@ def get_highest_coverage_station(clusters, stations):
         points = points.append(chosen.head(1), ignore_index=True, sort=False)
     return points
 
-
+# get stations (data within 1 year) with 30 years of data
 query = "SELECT sr.station_jsonb\
     FROM weather.stations_raw sr\
         WHERE (sr.station_jsonb ->> 'maxdate')::date >= CURRENT_DATE - INTERVAL '1 years'\
@@ -92,13 +92,16 @@ for result in results:
     flat_results.append(result[0])
 df = pd.DataFrame(flat_results)
 
+# use clustering algorithm and choose station with highest coverage
 radii = [5, 25, 50, 75, 100, 150, 200, 250, 350, 500]
 for radius in radii:
     clusters = cluster_stations(df, radius)
     df = get_highest_coverage_station(clusters, df)
 
+# add country code
 df = add_cc(df)
 
+# load into stations_world
 j = df.to_json(orient='records')
 results = json.loads(j)
 

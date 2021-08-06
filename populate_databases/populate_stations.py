@@ -1,4 +1,4 @@
-## This script gets 118,487 stations data from NOAA, and stores it in weather.stations_raw
+## This script gets stations data from NOAA, and stores it in stations_raw
 import os
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -35,7 +35,7 @@ base_url = "https://www.ncdc.noaa.gov/cdo-web/api/v2/stations"
 dataset_id = "?datasetid=GHCND"
 limit = "&limit=1000"
 
-# Function gets NOAA station data (118,487 entries - 1000 at a time) and loads into database
+# Function gets NOAA station data (1000 at a time) and loads into database
 def get_stations(entry_number = 1):
     try:
         time.sleep(.5)

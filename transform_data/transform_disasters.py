@@ -1,3 +1,4 @@
+## This script gets data from disasters_raw, adds the two letter country code, sorts it by date and loads into disasters_clean
 import os
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -28,7 +29,7 @@ def db_connect():
 
 cur = db_connect()
 
-
+# dictionary for country codes that have been dicontinued
 extras_dict = {
     "SUN":"RU",
     "YUG":"RS",
@@ -53,7 +54,7 @@ def add_cc(df):
     df['cc'] = cc
     return df
 
-
+# get disaster data, sort it
 query = "SELECT dr.disaster_jsonb FROM weather.disasters_raw dr ORDER BY dr.disaster_jsonb ->> 'Year', dr.disaster_jsonb ->> 'Month', dr.disaster_jsonb ->> 'Day'"
 cur.execute(query)
 results = cur.fetchall()
@@ -63,8 +64,10 @@ for result in results:
     flat_results.append(result[0])
 df = pd.DataFrame(flat_results)
 
+# add country code
 df = add_cc(df)
 
+# load into disasters_clean
 j = df.to_json(orient='records')
 results = json.loads(j)
 

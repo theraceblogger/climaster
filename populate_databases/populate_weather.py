@@ -43,7 +43,7 @@ limit = "&limit=1000"
 offset = "&offset="
 
 
-# Function gets data by customizing the iterations from the metadata and calling load_data()
+# Function gets data by customizing the iterations from the metadata (1990+) and calling load_data()
 def get_data(station):
     query = f"SELECT sw.station_jsonb ->> 'mindate', sw.station_jsonb ->> 'maxdate' FROM weather.stations_world sw WHERE sw.station_id = '{station}'"
     cur.execute(query)

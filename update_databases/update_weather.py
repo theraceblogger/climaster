@@ -43,7 +43,7 @@ units = "&units=standard"
 limit = "&limit=1000"
 offset = "&offset="
 
-# Function gets 1 year's data by customizing the iterations and calling load_data()
+# Function gets 30 days data by customizing the iterations and calling load_data()
 def get_data(station):
     end = date.today()
     start = end - timedelta(days=30)
@@ -102,9 +102,11 @@ stations = []
 for result in results:
     stations.append(result[0])
 
+# empty stations_loaded table
 query = "TRUNCATE TABLE weather.stations_loaded"
 cur.execute(query)
 
+# update each station and load into weather_raw, update stations_loaded
 for station in stations:
     get_data(station)
     try:

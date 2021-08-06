@@ -1,4 +1,4 @@
-## This script gets data from NOAA, and stores it in weather_raw
+## This script gets data from EMDAT, and stores it in disasters_raw
 import os
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -101,7 +101,7 @@ melanesia = ["FJI", "NCL", "PNG", "SLB", "VUT"]
 micronesia = ["FSM", "GUM", "KIR", "MHL", "NRU", "PLW", "MNP", "UMI"]
 oceania = polynesia + australia_new_zealand + melanesia + micronesia
 
-
+# set date variables
 end = date.today()
 start = end - timedelta(days=90)
 end = int(end.strftime("%Y"))
@@ -131,7 +131,7 @@ query = "mutation emdat_public($classif: [String!], $iso: [String!], $from: Int,
 result = run_query(query)
 link = result["data"]["emdat_public"]["link"]
 
-# Function to get data and inserts into database
+# Function to get data and inserts into disaster_raw
 def get_disasters():
     r = requests.get(link, headers=headers)
     csv_content = pd.read_excel(r.content, header=6)

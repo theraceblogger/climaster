@@ -127,7 +127,7 @@ query = "mutation emdat_public($classif: [String!], $iso: [String!], $from: Int,
 result = run_query(query)
 link = result["data"]["emdat_public"]["link"]
 
-# Function to get data and inserts into database
+# Function to get data and inserts into disasters_raw
 def get_disasters():
     r = requests.get(link, headers=headers)
     csv_content = pd.read_excel(r.content, header=6)
