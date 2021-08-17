@@ -3,3 +3,5 @@ plot_data/10m_physical/
 plot_data/gadm36_shp/
 *.png
 plot_data/us_shapefiles/
+analyze_data/.env
+analyze_data/.ipynb_checkpoints/analyze-checkpoint.ipynb

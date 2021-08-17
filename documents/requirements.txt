@@ -14,3 +14,5 @@ pip3 install pycountry
 pip3 install pycountry_convert
 pip3 install jupyter notebook
 pip3 install python-dotenv
+pip3 install matplotlib
+pip3 install seaborn
