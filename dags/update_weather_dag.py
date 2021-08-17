@@ -27,7 +27,7 @@ update_task = BashOperator(
     dag=update_transform_weather_dag
 )
 
-# Task: transform disasters
+# Task: transform weather
 transform_task = BashOperator(
     task_id='transform',
     bash_command='python3 /home/ec2-user/climaster/transform_data/transform_weather.py ',
