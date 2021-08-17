@@ -12,3 +12,5 @@ pip3 install shapely
 pip3 install reverse_geocoder
 pip3 install pycountry
 pip3 install pycountry_convert
+pip3 install jupyter notebook
+pip3 install python-dotenv

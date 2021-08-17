@@ -46,13 +46,13 @@ offset = "&offset="
 # Function gets 30 days data by customizing the iterations and calling load_data()
 def get_data(station):
     end = date.today()
-    start = end - timedelta(days=30)
+    start = end - timedelta(days=7)
     
     end = end.strftime("%Y-%m-%d")
     start = start.strftime("%Y-%m-%d")
 
-    end_year = end[:4]
-    start_year = start[:4]
+    end_yr = end[:4]
+    start_yr = start[:4]
 
     num_years = int(end_yr) - int(start_yr) +1
 
@@ -77,7 +77,6 @@ def get_data(station):
 def load_data(url, off_set=1):
     try:
         url2 = url + str(off_set)
-        time.sleep(10)
         r = requests.get(url2, headers=header)
         j = r.json()
         for result in j['results']:
