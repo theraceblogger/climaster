@@ -16,3 +16,4 @@ pip3 install jupyter notebook
 pip3 install python-dotenv
 pip3 install matplotlib
 pip3 install seaborn
+pip3 install PyICU
