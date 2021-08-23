@@ -1,6 +1,6 @@
-## This script gets station data from stations_raw, selects current stations (within 1 year) with at least 30 years of data,
-## uses a clustering algorithm to spatially reduce the stations to 1 per 500 km radius, adds the two letter country code,
-## and stores the stations in stations_world
+## This script gets station data from stations_raw, selects current stations (within 1 year),
+## uses a clustering algorithm to spatially reduce the stations to 1 per 500 km radius, 
+## adds the two letter country code, and stores the stations in stations_world
 import os
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -8,8 +8,8 @@ import json
 import pandas as pd
 import numpy as np
 from sklearn.cluster import DBSCAN
-from geopy.distance import great_circle
-from shapely.geometry import MultiPoint
+# from geopy.distance import great_circle
+# from shapely.geometry import MultiPoint
 import reverse_geocoder
 
 
@@ -78,11 +78,11 @@ def get_highest_coverage_station(clusters, stations):
         points = points.append(chosen.head(1), ignore_index=True, sort=False)
     return points
 
-# get stations (data within 1 year) with 30 years of data
+# get stations (data within 1 year) with 120 years of data
 query = "SELECT sr.station_jsonb\
     FROM weather.stations_raw sr\
         WHERE (sr.station_jsonb ->> 'maxdate')::date >= CURRENT_DATE - INTERVAL '1 years'\
-            AND (sr.station_jsonb ->> 'maxdate')::date - INTERVAL '30 years' >= (sr.station_jsonb ->> 'mindate')::date"
+            AND (sr.station_jsonb ->> 'maxdate')::date - INTERVAL '120 years' >= (sr.station_jsonb ->> 'mindate')::date"
 cur.execute(query)
 results = cur.fetchall()
 
@@ -92,7 +92,7 @@ for result in results:
 df = pd.DataFrame(flat_results)
 
 # use clustering algorithm and choose station with highest coverage
-radii = [5, 25, 50, 75, 100, 150, 200, 250, 350, 500]
+radii = [5, 25, 50, 75, 100, 150, 200]
 for radius in radii:
     clusters = cluster_stations(df, radius)
     df = get_highest_coverage_station(clusters, df)
@@ -106,10 +106,8 @@ results = json.loads(j)
 
 for result in results:
     try:
-        insert_sql = "INSERT INTO weather.stations_world (station_id, station_jsonb) VALUES (%s,%s) ON CONFLICT (station_id) DO UPDATE SET station_jsonb = %s"
-        cur.execute(insert_sql, (result['id'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True))) 
+        insert_sql = "INSERT INTO weather.stations_world (station_id, country_code, station_jsonb) VALUES (%s,%s,%s) ON CONFLICT (station_id) DO UPDATE SET country_code = %s, station_jsonb = %s"
+        cur.execute(insert_sql, (result['id'], result['cc'], json.dumps(result, indent=4, sort_keys=True), result['cc'], json.dumps(result, indent=4, sort_keys=True))) 
     except:
         print ('could not iterate through results')
-
-
 
