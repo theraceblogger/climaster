@@ -80,7 +80,7 @@ def load_data(url, off_set=1):
         # time.sleep(10)
         r = requests.get(url2, headers=header)
 
-        if request.status_code == 200:
+        if r.status_code == 200:
             j = r.json()
             for result in j['results']:
                 try:
