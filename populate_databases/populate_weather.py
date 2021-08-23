@@ -50,9 +50,9 @@ def get_data(station):
     meta = cur.fetchall()
     start, end = meta[0][0], meta[0][1]
     start_yr, end_yr = start[:4], end[:4]
-    # if int(start_yr) < 1990:
-    #     start_yr = '1990'
-    #     start = '1990-01-01'
+    if int(start_yr) < 1900:
+        start_yr = '1900'
+        start = '1900-01-01'
     num_years = int(end_yr) - int(start_yr) +1
 
     for year in range(num_years):
