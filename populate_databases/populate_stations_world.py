@@ -92,10 +92,10 @@ for result in results:
 df = pd.DataFrame(flat_results)
 
 # use clustering algorithm and choose station with highest coverage
-radii = [5, 25, 50, 75, 100, 150, 200]
-for radius in radii:
-    clusters = cluster_stations(df, radius)
-    df = get_highest_coverage_station(clusters, df)
+# radii = [5, 25, 50, 75, 100, 150, 200]
+# for radius in radii:
+#     clusters = cluster_stations(df, radius)
+#     df = get_highest_coverage_station(clusters, df)
 
 # add country code
 df = add_cc(df)
