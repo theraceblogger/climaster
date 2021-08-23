@@ -50,9 +50,9 @@ def get_data(station):
     meta = cur.fetchall()
     start, end = meta[0][0], meta[0][1]
     start_yr, end_yr = start[:4], end[:4]
-    if int(start_yr) < 1990:
-        start_yr = '1990'
-        start = '1990-01-01'
+    # if int(start_yr) < 1990:
+    #     start_yr = '1990'
+    #     start = '1990-01-01'
     num_years = int(end_yr) - int(start_yr) +1
 
     for year in range(num_years):
@@ -77,15 +77,17 @@ def get_data(station):
 def load_data(url, off_set=1):
     try:
         url2 = url + str(off_set)
-        time.sleep(10)
+        # time.sleep(10)
         r = requests.get(url2, headers=header)
-        j = r.json()
-        for result in j['results']:
-            try:
-                insert_sql = "INSERT INTO weather.weather_raw (station_id, date, datatype, weather_jsonb) VALUES (%s,%s,%s,%s) ON CONFLICT (station_id, date, datatype) DO UPDATE SET weather_jsonb = %s"
-                cur.execute(insert_sql, (result['station'], result['date'], result['datatype'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True)))
-            except:
-                print ('could not iterate through results')
+
+        if request.status_code == 200:
+            j = r.json()
+            for result in j['results']:
+                try:
+                    insert_sql = "INSERT INTO weather.weather_raw (station_id, date, datatype, weather_jsonb) VALUES (%s,%s,%s,%s) ON CONFLICT (station_id, date, datatype) DO UPDATE SET weather_jsonb = %s"
+                    cur.execute(insert_sql, (result['station'], result['date'], result['datatype'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True)))
+                except:
+                    print ('could not iterate through results')
         off_set += 1000
         if (off_set <= j['metadata']['resultset']['count']):
             load_data(url, off_set)
@@ -102,19 +104,41 @@ stations = []
 for result in results:
     stations.append(result[0])
 
-# get number of stations loaded for index
-query = "SELECT COUNT(*) FROM weather.stations_loaded"
+# get list of stations loaded
+query = "SELECT station_id FROM weather.stations_loaded"
 cur.execute(query)
-count = cur.fetchall()
-begin_index = count[0][0]
+results = cur.fetchall()
+
+stations_loaded = []
+for result in results:
+    stations_loaded.append(result[0])
 
 # get weather data and load into table weather_raw
-for i in range(begin_index, len(stations)):
-    station = stations[i]
-    get_data(station)
-    # update stations_loaded
-    try:
-        insert_sql = "INSERT INTO weather.stations_loaded (station_id) VALUES (%s) ON CONFLICT (station_id) DO UPDATE SET station_id = %s"
-        cur.execute(insert_sql, (station, station))
-    except:
-        print ('could not update stations_loaded')
+for station in stations:
+    if station in stations_loaded:
+        continue
+    else:
+        get_data(station)
+        # update stations_loaded
+        try:
+            insert_sql = "INSERT INTO weather.stations_loaded (station_id) VALUES (%s) ON CONFLICT (station_id) DO UPDATE SET station_id = %s"
+            cur.execute(insert_sql, (station, station))
+        except:
+            print ('could not update stations_loaded')
+
+# # get number of stations loaded for index
+# query = "SELECT COUNT(*) FROM weather.stations_loaded"
+# cur.execute(query)
+# count = cur.fetchall()
+# begin_index = count[0][0]
+
+# # get weather data and load into table weather_raw
+# for i in range(begin_index, len(stations)):
+#     station = stations[i]
+#     get_data(station)
+#     # update stations_loaded
+#     try:
+#         insert_sql = "INSERT INTO weather.stations_loaded (station_id) VALUES (%s) ON CONFLICT (station_id) DO UPDATE SET station_id = %s"
+#         cur.execute(insert_sql, (station, station))
+#     except:
+#         print ('could not update stations_loaded')
