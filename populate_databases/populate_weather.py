@@ -83,7 +83,7 @@ def load_data(url, off_set=1):
         # time.sleep(10)
         r = requests.get(url2, headers=header)
 
-        if r.status_code in [200, 201, 202, 203]:
+        if r.status_code == 200:
             j = r.json()
             for result in j['results']:
                 try:
@@ -94,6 +94,8 @@ def load_data(url, off_set=1):
             off_set += 1000
             if (off_set <= j['metadata']['resultset']['count']):
                 load_data(url, off_set)
+        else:
+            print(r.status_code)
     except KeyError:
         pass
 
