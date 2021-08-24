@@ -83,7 +83,7 @@ def load_data(url, off_set=1):
         # time.sleep(10)
         r = requests.get(url2, headers=header)
 
-        if r.status_code == 200:
+        if r.status_code in [200, 201, 202, 203]:
             j = r.json()
             for result in j['results']:
                 try:
