@@ -38,22 +38,24 @@ limit = "&limit=1000"
 # Function gets NOAA station data (1000 at a time) and loads into database
 def get_stations(entry_number = 1):
     try:
-        time.sleep(.5)
+        # time.sleep(.5)
         offset = "&offset=" + str(entry_number)
         url = base_url + dataset_id + limit + offset
         r = requests.get(url, headers=header)
-        j = r.json()
-
-        for result in j['results']:
-            try:
-                insert_sql = "INSERT INTO weather.stations_raw (station_id, station_jsonb) VALUES (%s,%s) ON CONFLICT (station_id) DO UPDATE SET station_jsonb = %s"
-                cur.execute(insert_sql, (result['id'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True))) 
-            except:
-                print ('could not iterate through results')
         
-        entry_number += 1000       
-        if (entry_number <= j['metadata']['resultset']['count']): 
-            get_stations(entry_number)
+        if r.status_code == 200:
+            j = r.json()
+
+            for result in j['results']:
+                try:
+                    insert_sql = "INSERT INTO weather.stations_raw (station_id, station_jsonb) VALUES (%s,%s) ON CONFLICT (station_id) DO UPDATE SET station_jsonb = %s"
+                    cur.execute(insert_sql, (result['id'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True))) 
+                except:
+                    print ('could not iterate through results')
+        
+            entry_number += 1000       
+            if (entry_number <= j['metadata']['resultset']['count']): 
+                get_stations(entry_number)
                 
     except:
         print('Function failed')
