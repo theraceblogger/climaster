@@ -12,6 +12,10 @@ from sklearn.cluster import DBSCAN
 # from shapely.geometry import MultiPoint
 import reverse_geocoder
 
+# import geopandas as gpd
+# import matplotlib.pyplot as plt
+# from shapely.geometry import Point, Polygon
+
 
 # Function that connects to database
 def db_connect():
@@ -82,7 +86,7 @@ def get_highest_coverage_station(clusters, stations):
 query = "SELECT sr.station_jsonb\
     FROM weather.stations_raw sr\
         WHERE (sr.station_jsonb ->> 'maxdate')::date >= CURRENT_DATE - INTERVAL '1 years'\
-            AND (sr.station_jsonb ->> 'maxdate')::date - INTERVAL '120 years' >= (sr.station_jsonb ->> 'mindate')::date"
+            AND (sr.station_jsonb ->> 'maxdate')::date - INTERVAL '60 years' >= (sr.station_jsonb ->> 'mindate')::date"
 cur.execute(query)
 results = cur.fetchall()
 
@@ -90,15 +94,36 @@ flat_results = []
 for result in results:
     flat_results.append(result[0])
 df = pd.DataFrame(flat_results)
+# print(f'Starting with {len(df)} stations')
 
 # use clustering algorithm and choose station with highest coverage
-# radii = [5, 25, 50, 75, 100, 150, 200]
-# for radius in radii:
-#     clusters = cluster_stations(df, radius)
-#     df = get_highest_coverage_station(clusters, df)
+radii = [5, 25, 50, 75, 100, 150, 200, 300, 400, 500]
+for radius in radii:
+    clusters = cluster_stations(df, radius)
+    df = get_highest_coverage_station(clusters, df)
+    # print(f'\nRadius: {radius}, Number of Stations: {len(df)}\nCoverage: {df.datacoverage.mean():.3f}')
 
 # add country code
 df = add_cc(df)
+
+# map = gpd.read_file('/Users/chuckschultz/climate_disaster_project/climaster_unused/plot_data/gadm36_shp/gadm36.shp')
+
+# lats = df.latitude.to_list()
+# lons = df.longitude.to_list()
+# lats = df.iloc[:,0].to_list()
+# lons = df.iloc[:,1].to_list()
+# coords = list(zip(lons, lats))
+
+# geometry = [Point(xy) for xy in coords]
+# geo_df = gpd.GeoDataFrame(df, 
+#                           crs='EPSG:4326', 
+#                           geometry = geometry)
+
+# fig, ax = plt.subplots(figsize=(20,10))
+# map.to_crs(epsg=4326).plot(ax=ax, color='lightgrey')
+# geo_df.plot(ax=ax, alpha=0.7, markersize=0.7)
+# ax.set_title('Weather Stations\n60 Years - Cluster500km')
+# fig.savefig("stations_world_60_cluster500km.png")
 
 # load into stations_world
 j = df.to_json(orient='records')
