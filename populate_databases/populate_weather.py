@@ -1,4 +1,5 @@
-## This script gets data from NOAA, and stores it in weather_raw
+## This script gets data from NOAA, of stations in weather.stations_world, and stores it in weather.weather_raw.
+## Updates weather.stations_loaded. Need to manually TRUNCATE weather.stations_loaded.
 import os
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -43,16 +44,18 @@ limit = "&limit=1000"
 offset = "&offset="
 
 
-# Function gets data by customizing the iterations from the metadata (1990+) and calling load_data()
+# Function gets data by customizing the iterations from the metadata (years:1900+) and calling load_data()
 def get_data(station):
     query = f"SELECT sw.station_jsonb ->> 'mindate', sw.station_jsonb ->> 'maxdate' FROM weather.stations_world sw WHERE sw.station_id = '{station}'"
     cur.execute(query)
     meta = cur.fetchall()
+
     start, end = meta[0][0], meta[0][1]
     start_yr, end_yr = start[:4], end[:4]
     if int(start_yr) < 1900:
         start_yr = '1900'
         start = '1900-01-01'
+    
     num_years = int(end_yr) - int(start_yr) +1
 
     for year in range(num_years):
@@ -73,7 +76,7 @@ def get_data(station):
             load_data(url)
 
 
-# Function gets the data and inserts it into the database, 1000 at a time
+# Function gets the data and inserts it into weather.weather_raw, 1000 at a time
 def load_data(url, off_set=1):
     try:
         url2 = url + str(off_set)
@@ -95,50 +98,37 @@ def load_data(url, off_set=1):
         pass
 
 
-# get list of stations
-query = "SELECT station_id FROM weather.stations_world"
-cur.execute(query)
-results = cur.fetchall()
+# Main function - calls get_data() for stations not loaded and updates weather.stations_loaded (Must manually TRUNCATE)
+def get_weather():
+    # get list of stations
+    query = "SELECT station_id FROM weather.stations_world"
+    cur.execute(query)
+    results = cur.fetchall()
 
-stations = []
-for result in results:
-    stations.append(result[0])
+    stations = []
+    for result in results:
+        stations.append(result[0])
 
-# get list of stations loaded
-query = "SELECT station_id FROM weather.stations_loaded"
-cur.execute(query)
-results = cur.fetchall()
+    # get list of stations loaded
+    query = "SELECT station_id FROM weather.stations_loaded"
+    cur.execute(query)
+    results = cur.fetchall()
 
-stations_loaded = []
-for result in results:
-    stations_loaded.append(result[0])
+    stations_loaded = []
+    for result in results:
+        stations_loaded.append(result[0])
 
-# get weather data and load into table weather_raw
-for station in stations:
-    if station in stations_loaded:
-        continue
-    else:
-        get_data(station)
-        # update stations_loaded
-        try:
-            insert_sql = "INSERT INTO weather.stations_loaded (station_id) VALUES (%s) ON CONFLICT (station_id) DO UPDATE SET station_id = %s"
-            cur.execute(insert_sql, (station, station))
-        except:
-            print ('could not update stations_loaded')
+    # get weather data and load into weather.weather_raw
+    for station in stations:
+        if station in stations_loaded:
+            continue
+        else:
+            get_data(station)
+            # update stations_loaded
+            try:
+                insert_sql = "INSERT INTO weather.stations_loaded (station_id) VALUES (%s) ON CONFLICT (station_id) DO UPDATE SET station_id = %s"
+                cur.execute(insert_sql, (station, station))
+            except:
+                print ('could not update stations_loaded')
 
-# # get number of stations loaded for index
-# query = "SELECT COUNT(*) FROM weather.stations_loaded"
-# cur.execute(query)
-# count = cur.fetchall()
-# begin_index = count[0][0]
-
-# # get weather data and load into table weather_raw
-# for i in range(begin_index, len(stations)):
-#     station = stations[i]
-#     get_data(station)
-#     # update stations_loaded
-#     try:
-#         insert_sql = "INSERT INTO weather.stations_loaded (station_id) VALUES (%s) ON CONFLICT (station_id) DO UPDATE SET station_id = %s"
-#         cur.execute(insert_sql, (station, station))
-#     except:
-#         print ('could not update stations_loaded')
+get_weather()
