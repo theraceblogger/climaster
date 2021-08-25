@@ -51,7 +51,7 @@ def get_data(station):
     cur.execute(query)
     meta = cur.fetchall()
 
-    country, region = meta[0][2], meta[0][3]
+    country, area = meta[0][2], meta[0][3]
     start, end = meta[0][0], meta[0][1]
     start_yr, end_yr = start[:4], end[:4]
     if int(start_yr) < 1950:
@@ -63,23 +63,23 @@ def get_data(station):
     for year in range(num_years):
         if num_years == 1:
             url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + start + end_date + end + units + limit + offset
-            load_data(url, country, region)
+            load_data(url, country, area)
 
         elif year == 0:
             url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + start + end_date + start_yr + "-12-31" + units + limit + offset
-            load_data(url, country, region)
+            load_data(url, country, area)
 
         elif year == num_years - 1:
             url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + end_yr + "-01-01" + end_date + end + units + limit + offset
-            load_data(url, country, region)
+            load_data(url, country, area)
 
         else:
             url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + str(int(start_yr) + year) + "-01-01" + end_date + str(int(start_yr) + year) + "-12-31" + units + limit + offset
-            load_data(url, country, region)
+            load_data(url, country, area)
 
 
 # Function gets the data and inserts it into weather.weather_raw, 1000 at a time
-def load_data(url, country, region, off_set=1):
+def load_data(url, country, area, off_set=1):
     try:
         url2 = url + str(off_set)
         # time.sleep(10)
@@ -90,12 +90,12 @@ def load_data(url, country, region, off_set=1):
             for result in j['results']:
                 try:
                     insert_sql = "INSERT INTO weather.weather_raw (station_id, date, datatype, country_code, region, weather_jsonb) VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (station_id, date, datatype) DO UPDATE SET country = %s, region = %s, weather_jsonb = %s"
-                    cur.execute(insert_sql, (result['station'], result['date'], result['datatype'], country, region, json.dumps(result, indent=4, sort_keys=True), country, region, json.dumps(result, indent=4, sort_keys=True)))
+                    cur.execute(insert_sql, (result['station'], result['date'], result['datatype'], country, area, json.dumps(result, indent=4, sort_keys=True), country, area, json.dumps(result, indent=4, sort_keys=True)))
                 except:
                     print ('could not iterate through results')
             off_set += 1000
             if (off_set <= j['metadata']['resultset']['count']):
-                load_data(url, country, region, off_set)
+                load_data(url, country, area, off_set)
         elif r.status_code == 429:
             sys.exit('Too many API calls!')
         else:
