@@ -50,7 +50,7 @@ def get_data(station):
     query = f"SELECT sl.station_jsonb ->> 'mindate', sl.station_jsonb ->> 'maxdate', sl.country_code, sl.region FROM weather.stations_to_load sl WHERE sl.station_id = '{station}'"
     cur.execute(query)
     meta = cur.fetchall()
-
+    print(meta)
     country, area = meta[0][2], meta[0][3]
     start, end = meta[0][0], meta[0][1]
     start_yr, end_yr = start[:4], end[:4]
@@ -88,11 +88,14 @@ def load_data(url, country, area, off_set=1):
         if r.status_code == 200:
             j = r.json()
             for result in j['results']:
-                try:
-                    insert_sql = "INSERT INTO weather.weather_raw (station_id, date, datatype, country_code, region, weather_jsonb) VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (station_id, date, datatype) DO UPDATE SET country = %s, region = %s, weather_jsonb = %s"
-                    cur.execute(insert_sql, (result['station'], result['date'], result['datatype'], country, area, json.dumps(result, indent=4, sort_keys=True), country, area, json.dumps(result, indent=4, sort_keys=True)))
-                except:
-                    print ('could not iterate through results')
+                print(result)
+                print(country, area)
+                # try:
+                #     insert_sql = "INSERT INTO weather.weather_raw (station_id, date, datatype, country_code, region, weather_jsonb) VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (station_id, date, datatype) DO UPDATE SET country = %s, region = %s, weather_jsonb = %s"
+                #     cur.execute(insert_sql, (result['station'], result['date'], result['datatype'], country, area, json.dumps(result, indent=4, sort_keys=True), country, area, json.dumps(result, indent=4, sort_keys=True)))
+                # except:
+                #     print ('could not iterate through results')
+                sys.exit()
             off_set += 1000
             if (off_set <= j['metadata']['resultset']['count']):
                 load_data(url, country, area, off_set)
