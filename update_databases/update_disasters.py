@@ -103,7 +103,7 @@ oceania = polynesia + australia_new_zealand + melanesia + micronesia
 
 # set date variables
 end = date.today()
-start = end - timedelta(days=90)
+start = end - timedelta(days=30)
 end = int(end.strftime("%Y"))
 start = int(start.strftime("%Y"))
 
