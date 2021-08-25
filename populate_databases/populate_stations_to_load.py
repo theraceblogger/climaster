@@ -1,7 +1,7 @@
 ## This script gets station data from weather.stations_raw,
 ## selects current stations (within 1 year) with 60 years of data,
 ## uses a clustering algorithm to spatially reduce the stations to 1 per 500 km radius, 
-## adds the two letter country code, and stores the stations in weather.stations_world
+## adds the two letter country code and region, and stores the stations in weather.stations_to_load
 import os
 import psycopg2
 from psycopg2.extras import DictCursor
