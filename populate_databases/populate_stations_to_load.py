@@ -81,7 +81,8 @@ def add_cc_region(df):
             if location[0]['cc'] in value:
                 region.append(key)
                 break
-        print(location[0]['cc'])
+        else:
+            print(location[0]['cc'])
     df['cc'] = country
     df['region'] = region
     return df
