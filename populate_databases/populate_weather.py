@@ -88,7 +88,7 @@ def load_data(url, country, area, off_set=1):
         if r.status_code == 200:
             j = r.json()
             for result in j['results']:
-                print(result)
+                print(result['station'], result['date'], result['datatype'])
                 print(country, area)
                 # try:
                 #     insert_sql = "INSERT INTO weather.weather_raw (station_id, date, datatype, country_code, region, weather_jsonb) VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (station_id, date, datatype) DO UPDATE SET country = %s, region = %s, weather_jsonb = %s"
