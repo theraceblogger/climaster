@@ -65,7 +65,7 @@ iso_dict = {
     'polynesia':['AS', 'CK', 'NU', 'PN', 'PF', 'TK', 'TO', 'TV', 'WF', 'WS'],
     'australia_new_zealand':['AU', 'NZ', 'NF', 'CC', 'CX', 'HM'],
     'melanesia':['FJ', 'NC', 'PG', 'SB', 'VU'],
-    'micronesia':['FM', 'GU', 'KI', 'MH', 'NR', 'PW', 'MP', 'UM']
+    'micronesia':['FM', 'GU', 'KI', 'MH', 'NR', 'PW', 'MP', 'UM'],
     # Antarctica
     'antarctica':['AQ']}
 
