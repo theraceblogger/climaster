@@ -30,9 +30,9 @@ cur = db_connect()
 
 
 def create_table(region):
-    query = "DROP TABLE IF EXISTS weather.weather_{region}"
+    query = f"DROP TABLE IF EXISTS weather.weather_{region}"
     cur.execute(query)
-    query = "CREATE TABLE weather.{region}(date DATE NOT NULL CONSTRAINT PRIMARY KEY, tmin DECIMAL, tmax DECIMAL, tavg DECIMAL, prcp DECIMAL, snow DECIMAL, snwd DECIMAL, tanm DECIMAL)"
+    query = f"CREATE TABLE weather.{region}(date DATE NOT NULL CONSTRAINT PRIMARY KEY, tmin DECIMAL, tmax DECIMAL, tavg DECIMAL, prcp DECIMAL, snow DECIMAL, snwd DECIMAL, tanm DECIMAL)"
     cur.execute(query)
     return
 
@@ -114,7 +114,7 @@ def avg_daily_region(region):
 
     for result in results:
         try:
-            insert_sql = "INSERT INTO weather.weather_{region} (date, tmin, tmax, tavg, prcp, snow, snwd, tanm)\
+            insert_sql = f"INSERT INTO weather.weather_{region} (date, tmin, tmax, tavg, prcp, snow, snwd, tanm)\
                 VALUES (%s,%s,%s,%s,%s,%s,%s,%s)\
                     ON CONFLICT (date)\
                         DO UPDATE SET tmin = %s, tmax = %s, tavg = %s, prcp = %s, snow = %s, snwd = %s, tanm = %s"
