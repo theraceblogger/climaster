@@ -60,7 +60,7 @@ def avg_daily_full():
     # outer join field DataFrames, add TAVG and TANM
     df = reduce(lambda  left,right: pd.merge(left,right,on=['date'], how='outer'), dataframes)
     df['TAVG'] = df[['TMIN', 'TMAX']].mean(axis=1)
-    mean = df[(df['date'] >= pd.to_datetime('1951-01-01')) & (df['date'] <= pd.to_datetime('1980-12-31'))]['TAVG'].mean()
+    mean = df[(df['date'] >= pd.to_datetime('1951-01-01')) & (df['date'] <= pd.to_datetime('1980-12-31'))]['TAVG'].mean(axis=0)
     df['TANM'] = df['TAVG'] - mean
 
     # load results into weather.weather_full
@@ -104,7 +104,7 @@ def avg_daily_region(region):
     # outer join field DataFrames, add TAVG and TANM
     df = reduce(lambda  left,right: pd.merge(left,right,on=['date'], how='outer'), dataframes)
     df['TAVG'] = df[['TMIN', 'TMAX']].mean(axis=1)
-    mean = df[(df['date'] >= pd.to_datetime('1951-01-01')) & (df['date'] <= pd.to_datetime('1980-12-31'))]['TAVG'].mean()
+    mean = df[(df['date'] >= pd.to_datetime('1951-01-01')) & (df['date'] <= pd.to_datetime('1980-12-31'))]['TAVG'].mean(axis=0)
     df['TANM'] = df['TAVG'] - mean
 
     # load results into weather.weather_{region}
