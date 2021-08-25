@@ -6,6 +6,7 @@ from psycopg2.extras import DictCursor
 import requests
 import json
 import time
+import sys
 
 
 # Function that connects to database
@@ -94,6 +95,8 @@ def load_data(url, off_set=1):
             off_set += 1000
             if (off_set <= j['metadata']['resultset']['count']):
                 load_data(url, off_set)
+        elif r.status_code == 429:
+            sys.exit('Too many API calls!')
         else:
             print(r.status_code)
     except KeyError:
