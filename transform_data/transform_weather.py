@@ -30,7 +30,7 @@ cur = db_connect()
 
 
 def create_table(region):
-    query = "TRUNCATE TABLE IF EXISTS weather.weather_{region}"
+    query = "DROP TABLE IF EXISTS weather.weather_{region}"
     cur.execute(query)
     query = "CREATE TABLE weather.{region}(date DATE NOT NULL CONSTRAINT PRIMARY KEY, tmin DECIMAL, tmax DECIMAL, tavg DECIMAL, prcp DECIMAL, snow DECIMAL, snwd DECIMAL, tanm DECIMAL)"
     cur.execute(query)
@@ -60,7 +60,7 @@ def avg_daily_full():
     # outer join field DataFrames, add TAVG and TANM
     df = reduce(lambda  left,right: pd.merge(left,right,on=['date'], how='outer'), dataframes)
     df['TAVG'] = df[['TMIN', 'TMAX']].mean(axis=1)
-    mean = df[(df['date'] >= '1951-01-01') & (df['date'] <= '1980-12-31')]['TAVG'].mean()
+    mean = df[(df['date'] >= pd.to_datetime('1951-01-01')) & (df['date'] <= pd.to_datetime('1980-12-31'))]['TAVG'].mean()
     df['TANM'] = df['TAVG'] - mean
 
     # load results into weather.weather_full
@@ -104,7 +104,7 @@ def avg_daily_region(region):
     # outer join field DataFrames, add TAVG and TANM
     df = reduce(lambda  left,right: pd.merge(left,right,on=['date'], how='outer'), dataframes)
     df['TAVG'] = df[['TMIN', 'TMAX']].mean(axis=1)
-    mean = df[(df['date'] >= '1951-01-01') & (df['date'] <= '1980-12-31')]['TAVG'].mean()
+    mean = df[(df['date'] >= pd.to_datetime('1951-01-01')) & (df['date'] <= pd.to_datetime('1980-12-31'))]['TAVG'].mean()
     df['TANM'] = df['TAVG'] - mean
 
     # load results into weather.weather_{region}
