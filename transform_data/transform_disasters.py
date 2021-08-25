@@ -28,7 +28,7 @@ def db_connect():
 
 cur = db_connect()
 
-# dictionary for country codes that have been dicontinued
+# dictionary for country codes that have been discontinued
 extras_dict = {
     "SUN":"RU",
     "YUG":"RS",
@@ -72,8 +72,8 @@ results = json.loads(j)
 
 for result in results:
     try:
-        insert_sql = "INSERT INTO weather.disasters_clean (disaster_no, year, country_code, region, disaster_type, deaths, damages)\
-            VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (disaster_no) DO UPDATE SET year = %s, country_code = %s, region = %s, disaster_type = %s, deaths = %s, damages = %s"
-        cur.execute(insert_sql, (result['Dis No'], result['Year'], result['cc'], result['Region'], result['Disaster Type'], result['Total Deaths'], result['Total Damages (\'000 US$)'], result['Year'], result['cc'], result['Region'], result['Disaster Type'], result['Total Deaths'], result['Total Damages (\'000 US$)']))
+        insert_sql = "INSERT INTO weather.disasters_clean (disaster_no, year, month, country_code, region, disaster_type, deaths, damages)\
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (disaster_no) DO UPDATE SET year = %s, month = %s, country_code = %s, region = %s, disaster_type = %s, deaths = %s, damages = %s"
+        cur.execute(insert_sql, (result['Dis No'], result['Year'], result['Start Month'], result['cc'], result['Region'], result['Disaster Type'], result['Total Deaths'], result['Total Damages (\'000 US$)'], result['Year'], result['Start Month'], result['cc'], result['Region'], result['Disaster Type'], result['Total Deaths'], result['Total Damages (\'000 US$)']))
     except:
         print ('could not iterate through results')

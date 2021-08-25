@@ -100,7 +100,8 @@ def load_data(url, country, region, off_set=1):
         elif r.status_code == 429:
             sys.exit('Too many API calls!')
         else:
-            print(r.status_code)
+            print('\nError Code:', r.status_code)
+            print(url2)
     except KeyError:
         pass
 

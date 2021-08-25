@@ -29,42 +29,116 @@ def db_connect():
 cur = db_connect()
 
 
-# get averages for each field, per day, and store in DataFrame
-fields = ['TMIN', 'TMAX', 'PRCP', 'SNOW', 'SNWD']
-dataframes = []
-for field in fields:
-    query = f"SELECT (wr.date)::date date, AVG((wr.weather_jsonb ->> 'value')::decimal) {field}\
-        FROM weather.weather_raw wr\
-            WHERE wr.datatype = '{field}'\
-                GROUP BY wr.date\
-                    ORDER BY wr.date"
+def create_table(region):
+    query = "TRUNCATE TABLE IF EXISTS weather.weather_{region}"
+    cur.execute(query)
+    query = "CREATE TABLE weather.{region}(date DATE NOT NULL CONSTRAINT PRIMARY KEY, tmin DECIMAL, tmax DECIMAL, tavg DECIMAL, prcp DECIMAL, snow DECIMAL, snwd DECIMAL, tanm DECIMAL)"
+    cur.execute(query)
+    return
+
+# Load weather.weather_full
+def avg_daily_full():
+    fields = ['TMIN', 'TMAX', 'PRCP', 'SNOW', 'SNWD']
+    dataframes = []
+
+    for field in fields:
+        query = f"SELECT (wr.date)::date date, AVG((wr.weather_jsonb ->> 'value')::decimal) {field}\
+            FROM weather.weather_raw wr\
+                WHERE wr.datatype = '{field}'\
+                    GROUP BY wr.date\
+                        ORDER BY wr.date"
+        cur.execute(query)
+        results = cur.fetchall()
+
+        flat_results = []
+        for result in results:
+            flat_results.append(result)
+        
+        field = pd.DataFrame(flat_results, columns=['date', field])
+        dataframes.append(field)
+    
+    # outer join field DataFrames, add TAVG and TANM
+    df = reduce(lambda  left,right: pd.merge(left,right,on=['date'], how='outer'), dataframes)
+    df['TAVG'] = df[['TMIN', 'TMAX']].mean(axis=1)
+    mean = df[(df['date'] >= '1951-01-01') & (df['date'] <= '1980-12-31')]['TAVG'].mean()
+    df['TANM'] = df['TAVG'] - mean
+
+    # load results into weather.weather_full
+    j = df.to_json(orient='records', date_format='iso')
+    results = json.loads(j)
+
+    for result in results:
+        try:
+            insert_sql = "INSERT INTO weather.weather_full (date, tmin, tmax, tavg, prcp, snow, snwd, tanm)\
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s)\
+                    ON CONFLICT (date)\
+                        DO UPDATE SET tmin = %s, tmax = %s, tavg = %s, prcp = %s, snow = %s, snwd = %s, tanm = %s"
+            cur.execute(insert_sql, (result['date'][:10], result['TMIN'], result['TMAX'], result['TAVG'], result['PRCP'], result['SNOW'],\
+                result['SNWD'], result['TANM'], result['TMIN'], result['TMAX'], result['TAVG'], result['PRCP'], result['SNOW'], result['SNWD'], result['TANM']))
+        except:
+            print ('could not iterate through results')
+
+
+
+# Load weather.weather_{region} tables
+def avg_daily_region(region):
+    fields = ['TMIN', 'TMAX', 'PRCP', 'SNOW', 'SNWD']
+    dataframes = []
+    
+    for field in fields:
+        query = f"SELECT (wr.date)::date date, AVG((wr.weather_jsonb ->> 'value')::decimal) {field}\
+            FROM weather.weather_raw wr\
+                WHERE wr.region = '{region}' AND wr.datatype = '{field}'\
+                    GROUP BY wr.date\
+                        ORDER BY wr.date"
+        cur.execute(query)
+        results = cur.fetchall()
+
+        flat_results = []
+        for result in results:
+            flat_results.append(result)
+        
+        field = pd.DataFrame(flat_results, columns=['date', field])
+        dataframes.append(field)
+    
+    # outer join field DataFrames, add TAVG and TANM
+    df = reduce(lambda  left,right: pd.merge(left,right,on=['date'], how='outer'), dataframes)
+    df['TAVG'] = df[['TMIN', 'TMAX']].mean(axis=1)
+    mean = df[(df['date'] >= '1951-01-01') & (df['date'] <= '1980-12-31')]['TAVG'].mean()
+    df['TANM'] = df['TAVG'] - mean
+
+    # load results into weather.weather_{region}
+    create_table(region)
+    j = df.to_json(orient='records', date_format='iso')
+    results = json.loads(j)
+
+    for result in results:
+        try:
+            insert_sql = "INSERT INTO weather.weather_{region} (date, tmin, tmax, tavg, prcp, snow, snwd, tanm)\
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s)\
+                    ON CONFLICT (date)\
+                        DO UPDATE SET tmin = %s, tmax = %s, tavg = %s, prcp = %s, snow = %s, snwd = %s, tanm = %s"
+            cur.execute(insert_sql, (result['date'][:10], result['TMIN'], result['TMAX'], result['TAVG'], result['PRCP'], result['SNOW'],\
+                result['SNWD'], result['TANM'], result['TMIN'], result['TMAX'], result['TAVG'], result['PRCP'], result['SNOW'], result['SNWD'], result['TANM']))
+        except:
+            print ('could not iterate through results')
+
+
+def load_tables():
+    # daily averages of each datatype for all regions
+    avg_daily_full()
+
+    query = "SELECT DISTINCT wr.region FROM weather.weather_raw wr"
     cur.execute(query)
     results = cur.fetchall()
 
-    flat_results = []
+    regions = []
     for result in results:
-        flat_results.append(result)
+        regions.append(result[0])
     
-    field = pd.DataFrame(flat_results, columns=['date', field])
-    dataframes.append(field)
+    # daily averages of each datatype for each region (24 regions)
+    for region in regions:
+        avg_daily_region(region)
 
 
-# outer join field DataFrames, add TAVG
-df = reduce(lambda  left,right: pd.merge(left,right,on=['date'], how='outer'), dataframes)
-df['TAVG'] = df[['TMIN', 'TMAX']].mean(axis=1)
-
-
-# load results into weather_clean
-j = df.to_json(orient='records', date_format='iso')
-results = json.loads(j)
-
-for result in results:
-    try:
-        insert_sql = "INSERT INTO weather.weather_clean (date, tmin, tmax, tavg, prcp, snow, snwd)\
-            VALUES (%s,%s,%s,%s,%s,%s,%s)\
-                ON CONFLICT (date)\
-                    DO UPDATE SET tmin = %s, tmax = %s, tavg = %s, prcp = %s, snow = %s, snwd = %s"
-        cur.execute(insert_sql, (result['date'][:10], result['TMIN'], result['TMAX'], result['TAVG'], result['PRCP'], result['SNOW'],\
-            result['SNWD'], result['TMIN'], result['TMAX'], result['TAVG'], result['PRCP'], result['SNOW'], result['SNWD']))
-    except:
-        print ('could not iterate through results')
+load_tables()
