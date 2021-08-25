@@ -32,7 +32,7 @@ cur = db_connect()
 def create_table(region):
     query = f"DROP TABLE IF EXISTS weather.weather_{region}"
     cur.execute(query)
-    query = f"CREATE TABLE weather.{region}(date DATE NOT NULL CONSTRAINT PRIMARY KEY, tmin DECIMAL, tmax DECIMAL, tavg DECIMAL, prcp DECIMAL, snow DECIMAL, snwd DECIMAL, tanm DECIMAL)"
+    query = f"CREATE TABLE weather.weather_{region}(date DATE NOT NULL PRIMARY KEY, tmin DECIMAL, tmax DECIMAL, tavg DECIMAL, prcp DECIMAL, snow DECIMAL, snwd DECIMAL, tanm DECIMAL)"
     cur.execute(query)
     return
 
