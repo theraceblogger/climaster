@@ -131,7 +131,7 @@ def get_weather():
         if station in stations_loaded:
             continue
         else:
-            api_calls = get_data(station)
+            api_calls = get_data(station, api_calls)
             # update stations_loaded
             try:
                 insert_sql = "INSERT INTO weather.stations_loaded (station_id) VALUES (%s) ON CONFLICT (station_id) DO UPDATE SET station_id = %s"
