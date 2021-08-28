@@ -1,4 +1,4 @@
-'''This script gets minimum temperatures for stations_to_load and loads them into weather_tmin,
+'''This script gets snowfall for stations_to_load and loads them into weather_snow,
 updates stations_loaded'''
 
 import os
@@ -35,7 +35,7 @@ header = {'token': noaa_token}
 base_url = "https://www.ncdc.noaa.gov/cdo-web/api/v2/data"
 dataset_id = "?datasetid=GHCND"
 datatype_id = "&datatypeid="
-datatype = "TMIN"
+datatype = "SNOW"
 station_id = "&stationid="
 start_date = "&startdate="
 end_date = "&enddate="
@@ -76,11 +76,11 @@ def get_data(station, api_calls):
             api_calls = load_data(url, country, region, api_calls)
     return api_calls
 
-# Function gets the data and inserts it into weather_tmin, 1000 at a time
+# Function gets the data and inserts it into weather_snow, 1000 at a time
 def load_data(url, country, region, api_calls, off_set=1):
     try:
         url2 = url + str(off_set)
-        time.sleep(.2)
+        time.sleep(2)
         r = requests.get(url2, headers=header)
         api_calls += 1
 
@@ -88,7 +88,7 @@ def load_data(url, country, region, api_calls, off_set=1):
             j = r.json()
             for result in j['results']:
                 try:
-                    insert_sql = "INSERT INTO weather.weather_tmin (station_id, date, country_code, region, weather_jsonb) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (station_id, date) DO UPDATE SET country_code=%s, region=%s, weather_jsonb=%s"
+                    insert_sql = "INSERT INTO weather.weather_snow (station_id, date, country_code, region, weather_jsonb) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (station_id, date) DO UPDATE SET country_code=%s, region=%s, weather_jsonb=%s"
                     cur.execute(insert_sql, (result['station'], result['date'], country, region, json.dumps(result, indent=4, sort_keys=True), country, region, json.dumps(result, indent=4, sort_keys=True)))
                 except:
                     print ('could not iterate through results')
@@ -125,9 +125,9 @@ def get_weather():
     for result in results:
         stations_loaded.append(result[0])
 
-    # get weather data and load into weather_tmin
+    # get weather data and load into weather_snow
     api_calls = 0
-    for station in stations[:2]:
+    for station in stations:
         if station in stations_loaded:
             continue
         else:
