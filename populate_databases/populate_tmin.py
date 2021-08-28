@@ -42,7 +42,6 @@ end_date = "&enddate="
 units = "&units=standard"
 limit = "&limit=1000"
 offset = "&offset="
-api_calls = 0
 
 # Function gets data by customizing the iterations from the metadata (years:1950+) and calling load_data()
 def get_data(station):
@@ -125,7 +124,8 @@ def get_weather():
         stations_loaded.append(result[0])
 
     # get weather data and load into weather_tmin
-    for station in stations:
+    api_calls = 0
+    for station in stations[:2]:
         if station in stations_loaded:
             continue
         else:
@@ -136,6 +136,7 @@ def get_weather():
                 cur.execute(insert_sql, (station, station))
             except:
                 print ('could not update stations_loaded')
+    return api_calls
 
-get_weather()
+api_calls = get_weather()
 print(f'{api_calls} requests')
