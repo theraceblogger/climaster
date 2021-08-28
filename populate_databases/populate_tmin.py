@@ -6,6 +6,7 @@ import psycopg2
 from psycopg2.extras import DictCursor
 import requests
 import json
+import sys
 
 # Function that connects to database
 def db_connect():
