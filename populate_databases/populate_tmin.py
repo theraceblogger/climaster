@@ -42,6 +42,7 @@ end_date = "&enddate="
 units = "&units=standard"
 limit = "&limit=1000"
 offset = "&offset="
+api_calls = 0
 
 # Function gets data by customizing the iterations from the metadata (years:1950+) and calling load_data()
 def get_data(station):
@@ -79,8 +80,9 @@ def get_data(station):
 def load_data(url, country, region, off_set=1):
     try:
         url2 = url + str(off_set)
-        time.sleep(2)
+        time.sleep(.2)
         r = requests.get(url2, headers=header)
+        api_calls += 1
 
         if r.status_code == 200:
             j = r.json()
@@ -95,7 +97,7 @@ def load_data(url, country, region, off_set=1):
             if (off_set <= j['metadata']['resultset']['count']):
                 load_data(url, country, region, off_set)
         elif r.status_code == 429:
-            sys.exit('Too many API calls!')
+            sys.exit(f'Too many API calls!\n{api_calls} requests')
         else:
             print('\nError Code:', r.status_code)
             print(url2)
@@ -136,3 +138,4 @@ def get_weather():
                 print ('could not update stations_loaded')
 
 get_weather()
+print(f'{api_calls} requests')
