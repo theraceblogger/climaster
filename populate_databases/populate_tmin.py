@@ -6,6 +6,7 @@ import psycopg2
 from psycopg2.extras import DictCursor
 import requests
 import json
+import time
 import sys
 
 # Function that connects to database
