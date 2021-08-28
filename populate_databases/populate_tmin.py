@@ -1,5 +1,5 @@
-'''This script gets minimum temperatures for stations_to_load, averages them by day,
-and loads them into weather_{region} tables'''
+'''This script gets minimum temperatures for stations_to_load and loads them into weather_tmin,
+updates stations_loaded'''
 
 import os
 import psycopg2
@@ -74,7 +74,7 @@ def get_data(station):
             url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + str(int(start_yr) + year) + "-01-01" + end_date + str(int(start_yr) + year) + "-12-31" + units + limit + offset
             load_data(url, country, region)
 
-# Function gets the data and inserts it into weather_{region}, 1000 at a time
+# Function gets the data and inserts it into weather_tmin, 1000 at a time
 def load_data(url, country, region, off_set=1):
     try:
         url2 = url + str(off_set)
@@ -100,7 +100,7 @@ def load_data(url, country, region, off_set=1):
     except KeyError:
         pass
 
-# Main function - calls get_data() for stations not loaded and updates weather.stations_loaded (Must manually TRUNCATE)
+# Main function - calls get_data() for stations_to_load and updates stations_loaded (Must manually TRUNCATE)
 def get_weather():
     # get list of stations
     query = "SELECT station_id FROM weather.stations_to_load"
@@ -120,7 +120,7 @@ def get_weather():
     for result in results:
         stations_loaded.append(result[0])
 
-    # get weather data and load into weather.weather_raw
+    # get weather data and load into weather_tmin
     for station in stations:
         if station in stations_loaded:
             continue
