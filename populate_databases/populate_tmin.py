@@ -78,6 +78,7 @@ def get_data(station):
 def load_data(url, country, region, off_set=1):
     try:
         url2 = url + str(off_set)
+        time.sleep(2)
         r = requests.get(url2, headers=header)
 
         if r.status_code == 200:
