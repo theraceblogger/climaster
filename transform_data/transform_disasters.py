@@ -1,4 +1,5 @@
-## This script gets data from disasters_raw, adds the two letter country code, sorts it by date and loads into disasters_clean
+'''This script gets data from disasters_raw, adds the two letter country code, sorts it by date and loads into disasters_clean'''
+
 import os
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -28,6 +29,7 @@ def db_connect():
 
 cur = db_connect()
 
+
 # dictionary for country codes that have been discontinued
 extras_dict = {
     "SUN":"RU",
@@ -42,6 +44,7 @@ extras_dict = {
     "ANT":"CW",
     "DDR":"DE"}
 
+
 def add_cc(df):
     cc = []
     for i in range(df.shape[0]):
@@ -53,27 +56,31 @@ def add_cc(df):
     df['cc'] = cc
     return df
 
+
 # get disaster data, sort it
-query = "SELECT dr.disaster_jsonb FROM weather.disasters_raw dr ORDER BY dr.disaster_jsonb ->> 'Year', dr.disaster_jsonb ->> 'Month', dr.disaster_jsonb ->> 'Day'"
-cur.execute(query)
-results = cur.fetchall()
+def get_disasters():
+    query = "SELECT dr.disaster_jsonb FROM weather.disasters_raw dr ORDER BY dr.disaster_jsonb ->> 'Year', dr.disaster_jsonb ->> 'Month', dr.disaster_jsonb ->> 'Day'"
+    cur.execute(query)
+    results = cur.fetchall()
 
-flat_results = []
-for result in results:
-    flat_results.append(result[0])
-df = pd.DataFrame(flat_results)
+    flat_results = []
+    for result in results:
+        flat_results.append(result[0])
+    df = pd.DataFrame(flat_results)
 
-# add country code
-df = add_cc(df)
+    # add country code
+    df = add_cc(df)
 
-# load into disasters_clean
-j = df.to_json(orient='records')
-results = json.loads(j)
+    # load into disasters_clean
+    j = df.to_json(orient='records')
+    results = json.loads(j)
 
-for result in results:
-    try:
-        insert_sql = "INSERT INTO weather.disasters_clean (disaster_no, year, month, country_code, region, disaster_type, deaths, damages)\
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (disaster_no) DO UPDATE SET year = %s, month = %s, country_code = %s, region = %s, disaster_type = %s, deaths = %s, damages = %s"
-        cur.execute(insert_sql, (result['Dis No'], result['Year'], result['Start Month'], result['cc'], result['Region'], result['Disaster Type'], result['Total Deaths'], result['Total Damages (\'000 US$)'], result['Year'], result['Start Month'], result['cc'], result['Region'], result['Disaster Type'], result['Total Deaths'], result['Total Damages (\'000 US$)']))
-    except:
-        print ('could not iterate through results')
+    for result in results:
+        try:
+            insert_sql = "INSERT INTO weather.disasters_clean (disaster_no, year, month, country_code, region, disaster_type, deaths, damages)\
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (disaster_no) DO UPDATE SET year = %s, month = %s, country_code = %s, region = %s, disaster_type = %s, deaths = %s, damages = %s"
+            cur.execute(insert_sql, (result['Dis No'], result['Year'], result['Start Month'], result['cc'], result['Region'], result['Disaster Type'], result['Total Deaths'], result['Total Damages (\'000 US$)'], result['Year'], result['Start Month'], result['cc'], result['Region'], result['Disaster Type'], result['Total Deaths'], result['Total Damages (\'000 US$)']))
+        except:
+            print ('could not iterate through results')
+
+get_disasters()

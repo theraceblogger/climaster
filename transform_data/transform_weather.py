@@ -1,5 +1,6 @@
-## This script takes the data in weather_raw, averages each datatype per day,
-## adds a daily average and stores this in weather_clean
+'''This script takes the data in weather_raw, adds tavg (temperature average) and tanm (temperature anomaly),
+averages each datatype per day, and stores in weather_full and weather_{region}'''
+
 import os
 import psycopg2
 from psycopg2.extras import DictCursor

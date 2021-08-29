@@ -1,4 +1,5 @@
-## This script gets data from EMDAT and loads it into disasters_raw
+'''This script gets data from EMDAT and loads it into disasters_raw'''
+
 import os
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -113,6 +114,7 @@ varz =  {
 	"to": 2021 # (int)end date - 1900 to 2021
 }
 
+
 # Function using GraphQL to make the API call for link to data API
 def run_query(query):
     request = requests.post(url, json={"query": query, "operationName": opName, "variables": varz}, headers=headers)
@@ -126,6 +128,7 @@ def run_query(query):
 query = "mutation emdat_public($classif: [String!], $iso: [String!], $from: Int, $to: Int) {\n  emdat_public(classif: $classif, iso: $iso, from: $from, to: $to) {\n    count\n    link\n    xlsx\n  }\n}\n"
 result = run_query(query)
 link = result["data"]["emdat_public"]["link"]
+
 
 # Function to get data and inserts into disasters_raw
 def get_disasters():

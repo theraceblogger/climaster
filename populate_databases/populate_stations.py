@@ -1,4 +1,5 @@
-## This script gets stations data from NOAA, and stores it in stations_raw
+'''This script gets stations data from NOAA, and stores it in stations_raw'''
+
 import os
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -34,6 +35,7 @@ header = {'token': noaa_token}
 base_url = "https://www.ncdc.noaa.gov/cdo-web/api/v2/stations"
 dataset_id = "?datasetid=GHCND"
 limit = "&limit=1000"
+
 
 # Function gets NOAA station data (1000 at a time) and loads into database
 def get_stations(entry_number = 1):

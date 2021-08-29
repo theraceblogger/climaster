@@ -1,7 +1,8 @@
-## This script gets station data from weather.stations_raw,
-## selects current stations (within 1 year) with 60 years of data,
-## uses a clustering algorithm to spatially reduce the stations to 1 per 500 km radius, 
-## adds the two letter country code and region, and stores the stations in weather.stations_to_load
+'''This script gets station data from weather.stations_raw,
+selects current stations (within 1 year) with 60 years of data,
+uses a clustering algorithm to spatially reduce the stations to 1 per 500 km radius, 
+adds the two letter country code and region, and stores the stations in weather.stations_to_load'''
+
 import os
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -31,7 +32,6 @@ def db_connect():
     return cur
 
 cur = db_connect()
-
 
 
 ## iso
@@ -68,6 +68,7 @@ iso_dict = {
     'micronesia':['FM', 'GU', 'KI', 'MH', 'NR', 'PW', 'MP', 'UM'],
     # Antarctica
     'antarctica':['AQ']}
+
 
 # add country_code and region to dataframe
 def add_cc_region(df):
@@ -114,7 +115,6 @@ def get_highest_coverage_station(clusters, stations):
     return points
 
 
-
 # get stations (data within 1 year) with 60 years of data and loads into weather.stations_world
 def get_stations():
     query = "SELECT sr.station_jsonb\
@@ -148,5 +148,6 @@ def get_stations():
             cur.execute(insert_sql, (result['id'], result['cc'], result['region'], json.dumps(result, indent=4, sort_keys=True), result['cc'], result['region'], json.dumps(result, indent=4, sort_keys=True))) 
         except:
             print ('could not iterate through results')
+
 
 get_stations()
