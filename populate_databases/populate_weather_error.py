@@ -1,5 +1,4 @@
-'''This script gets data from NOAA, of stations in weather.stations_to_load, and stores it in weather.weather_raw.
-Updates weather.stations_loaded. Need to manually TRUNCATE weather.stations_loaded.'''
+'''This script gets data from NOAA, of stations in weather.stations_to_load, and stores it in weather.weather_raw.'''
 
 import os
 import psycopg2
@@ -8,7 +7,6 @@ import requests
 import json
 import time
 import sys
-
 
 # Function that connects to database
 def db_connect():
@@ -29,7 +27,6 @@ def db_connect():
     return cur
 
 cur = db_connect()
-
 
 # Set variables
 noaa_token = os.environ['noaa_token']
@@ -118,7 +115,7 @@ def load_data(url, country, region, station, api_calls, off_set=1):
 # Main function - calls get_data() for stations not loaded and updates weather.stations_loaded (Must manually TRUNCATE)
 def get_weather():
     # get list of stations
-    query = "SELECT station_id FROM weather.stations_to_load"
+    query = "SELECT station_id FROM weather.station_error"
     cur.execute(query)
     results = cur.fetchall()
 
@@ -134,7 +131,7 @@ def get_weather():
     stations_loaded = []
     for result in results:
         stations_loaded.append(result[0])
-
+    
     # get weather data and load into weather.weather_raw
     api_calls = 0
     for station in stations:
