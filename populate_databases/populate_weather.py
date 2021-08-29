@@ -1,5 +1,6 @@
-## This script gets data from NOAA, of stations in weather.stations_to_load, and stores it in weather.weather_raw.
-## Updates weather.stations_loaded. Need to manually TRUNCATE weather.stations_loaded.
+'''This script gets data from NOAA, of stations in weather.stations_to_load, and stores it in weather.weather_raw.
+Updates weather.stations_loaded. Need to manually TRUNCATE weather.stations_loaded.'''
+
 import os
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -131,10 +132,10 @@ def get_weather():
 
     # get weather data and load into weather.weather_raw
     api_calls = 0
-    for station in stations[:2]:
+    for station in stations:
         if station in stations_loaded:
             continue
-        else:
+        elif api_calls < 9800:
             api_calls = get_data(station, api_calls)
             # update stations_loaded
             try:
@@ -142,7 +143,11 @@ def get_weather():
                 cur.execute(insert_sql, (station, station))
             except:
                 print ('could not update stations_loaded')
+        else:
+            print(len(stations_loaded), 'stations loaded out of', len(stations), 'stations\n')
+            break
     return api_calls
+
 
 api_calls = get_weather()
 print(f'{api_calls} requests')
