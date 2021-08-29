@@ -1,4 +1,5 @@
-## This script gets data from NOAA, and stores it in weather_raw
+'''This script gets data from NOAA, and updates weather_raw'''
+
 import os
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -30,6 +31,7 @@ def db_connect():
 
 cur = db_connect()
 
+
 # Set variables
 noaa_token = os.environ['noaa_token']
 header = {'token': noaa_token}
@@ -43,6 +45,7 @@ end_date = "&enddate="
 units = "&units=standard"
 limit = "&limit=1000"
 offset = "&offset="
+
 
 # Function gets 14 days data by customizing the iterations and calling load_data()
 def get_data(station):
@@ -79,10 +82,12 @@ def get_data(station):
             url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + str(int(start_yr) + year) + "-01-01" + end_date + str(int(start_yr) + year) + "-12-31" + units + limit + offset
             load_data(url, country, region)
 
+
 # Function gets the data and inserts it into the database, 1000 at a time
 def load_data(url, country, region, off_set=1):
     try:
         url2 = url + str(off_set)
+        time.sleep(.2)
         r = requests.get(url2, headers=header)
 
         if r.status_code == 200:
@@ -141,5 +146,6 @@ def get_weather():
                 cur.execute(insert_sql, (station, station))
             except:
                 print ('could not update stations_loaded')
+
 
 get_weather()
