@@ -131,7 +131,7 @@ def get_weather():
 
     # get weather data and load into weather.weather_raw
     api_calls = 0
-    for station in stations:
+    for station in stations[:2]:
         if station in stations_loaded:
             continue
         else:
