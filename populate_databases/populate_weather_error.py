@@ -104,7 +104,7 @@ def load_data(url, country, region, station, api_calls, off_set=1):
             except:
                 print ('could not update error table')
             finally:
-                sys.exit('Too many API calls!\n{api_calls} requests')
+                sys.exit(f'Too many API calls!\n{api_calls} requests')
         else:
             print('\nError Code:', r.status_code)
             print(url2)

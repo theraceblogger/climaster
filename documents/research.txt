@@ -51,6 +51,8 @@ https://climate.nasa.gov/vital-signs/global-temperature/
 Aravind Sivalingam
 https://www.kaggle.com/dataenergy/eda-of-climate-change-and-natural-disasters
 
+https://earthobservatory.nasa.gov/world-of-change/global-temperatures
+
 
 
 Science Daily - Earth Scientists Use Fractals To Measure And Predict Natural Disasters; American Institute Of Physics 2002-01-31
