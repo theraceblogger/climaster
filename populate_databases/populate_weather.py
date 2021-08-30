@@ -101,7 +101,13 @@ def load_data(url, country, region, station, api_calls, off_set=1):
             if (off_set <= j['metadata']['resultset']['count']):
                 api_calls = load_data(url, country, region, api_calls, off_set)
         elif r.status_code == 429:
-            sys.exit('Too many API calls!\n{api_calls} requests')
+            try:
+                insert_sql = "INSERT INTO weather.station_error (station_id, error_code, url) VALUES (%s,%s,%s)"
+                cur.execute(insert_sql, (station, r.status_code, url2))
+            except:
+                print ('could not update error table')
+            finally:
+                sys.exit('Too many API calls!\n{api_calls} requests')
         else:
             print('\nError Code:', r.status_code)
             print(url2)
