@@ -152,6 +152,13 @@ def get_weather():
             except:
                 print ('could not update stations_loaded')
         else:
+            query = "SELECT station_id FROM weather.stations_loaded"
+            cur.execute(query)
+            results = cur.fetchall()
+
+            stations_loaded = []
+            for result in results:
+                stations_loaded.append(result[0])
             print(len(stations_loaded), 'stations loaded out of', len(stations), 'stations\n')
             break
     return api_calls
