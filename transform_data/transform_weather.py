@@ -7,6 +7,7 @@ from psycopg2.extras import DictCursor
 import json
 import pandas as pd
 from functools import reduce
+from datetime import date
 
 
 # Function that connects to database
@@ -31,9 +32,7 @@ cur = db_connect()
 
 
 def create_table(region):
-    query = f"DROP TABLE IF EXISTS weather.weather_{region}"
-    cur.execute(query)
-    query = f"CREATE TABLE weather.weather_{region}(date DATE NOT NULL PRIMARY KEY, tmin DECIMAL, tmax DECIMAL, tavg DECIMAL, prcp DECIMAL, snow DECIMAL, snwd DECIMAL, tanm DECIMAL)"
+    query = f"CREATE TABLE IF NOT EXISTS weather.weather_{region}(date DATE NOT NULL PRIMARY KEY, tmin FLOAT, tmax FLOAT, tavg FLOAT, prcp FLOAT, snow FLOAT, snwd FLOAT, tanm FLOAT)"
     cur.execute(query)
     return
 
@@ -61,7 +60,7 @@ def avg_daily_full():
     # outer join field DataFrames, add TAVG and TANM
     df = reduce(lambda  left,right: pd.merge(left,right,on=['date'], how='outer'), dataframes)
     df['TAVG'] = df[['TMIN', 'TMAX']].mean(axis=1)
-    mean = df[(df['date'] >= pd.to_datetime('1951-01-01')) & (df['date'] <= pd.to_datetime('1980-12-31'))]['TAVG'].mean(axis=0)
+    mean = df[(df['date'] >= date(1951,1,1)) & (df['date'] <= date(1980,12,31))]['TAVG'].mean(axis=0)
     df['TANM'] = df['TAVG'] - mean
 
     # load results into weather.weather_full
@@ -105,7 +104,7 @@ def avg_daily_region(region):
     # outer join field DataFrames, add TAVG and TANM
     df = reduce(lambda  left,right: pd.merge(left,right,on=['date'], how='outer'), dataframes)
     df['TAVG'] = df[['TMIN', 'TMAX']].mean(axis=1)
-    mean = df[(df['date'] >= pd.to_datetime('1951-01-01')) & (df['date'] <= pd.to_datetime('1980-12-31'))]['TAVG'].mean(axis=0)
+    mean = df[(df['date'] >= date(1951,1,1)) & (df['date'] <= date(1980,12,31))]['TAVG'].mean(axis=0)
     df['TANM'] = df['TAVG'] - mean
 
     # load results into weather.weather_{region}
