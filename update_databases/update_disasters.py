@@ -1,4 +1,5 @@
-## This script gets data from EMDAT, and stores it in disasters_raw
+'''This script gets data from EMDAT, and stores it in disasters_raw'''
+
 import os
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -7,6 +8,7 @@ import json
 import pandas as pd
 from datetime import date
 from datetime import timedelta
+
 
 # Function that connects to database
 def db_connect():
@@ -27,6 +29,7 @@ def db_connect():
     return cur
 
 cur = db_connect()
+
 
 ## classif
 natural = ["1"]
@@ -101,11 +104,13 @@ melanesia = ["FJI", "NCL", "PNG", "SLB", "VUT"]
 micronesia = ["FSM", "GUM", "KIR", "MHL", "NRU", "PLW", "MNP", "UMI"]
 oceania = polynesia + australia_new_zealand + melanesia + micronesia
 
+
 # set date variables
 end = date.today()
-start = end - timedelta(days=30)
+start = end - timedelta(days=14)
 end = int(end.strftime("%Y"))
 start = int(start.strftime("%Y"))
+
 
 # Set variables
 url = 'https://public.emdat.be/api/graphql'
@@ -118,6 +123,7 @@ varz =  {
 	"to": end # (int)end date - 1900 to 2021
 }
 
+
 # Function using GraphQL to make the API call for link to data API
 def run_query(query):
     request = requests.post(url, json={"query": query, "operationName": opName, "variables": varz}, headers=headers)
@@ -126,10 +132,12 @@ def run_query(query):
     else:
         raise Exception("Query failed to run by returning code of {}. {}".format(request.status_code, query))
 
+
 # Query to get the link for the data
 query = "mutation emdat_public($classif: [String!], $iso: [String!], $from: Int, $to: Int) {\n  emdat_public(classif: $classif, iso: $iso, from: $from, to: $to) {\n    count\n    link\n    xlsx\n  }\n}\n"
 result = run_query(query)
 link = result["data"]["emdat_public"]["link"]
+
 
 # Function to get data and inserts into disaster_raw
 def get_disasters():

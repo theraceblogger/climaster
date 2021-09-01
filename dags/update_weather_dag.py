@@ -17,7 +17,7 @@ default_arguments = {
 update_transform_weather_dag = DAG(
     dag_id='update_transform_weather',
     default_args=default_arguments,
-    schedule_interval=None
+    schedule_interval="0 2 * * 6"
 )
 
 # Task: update weather

@@ -17,7 +17,7 @@ default_arguments = {
 update_analyze_dag = DAG(
     dag_id='update_analyze',
     default_args=default_arguments,
-    schedule_interval=None
+    schedule_interval="0 3 * * 6"
 )
 
 # Task: update analyze
@@ -26,3 +26,5 @@ update_task = BashOperator(
     bash_command='jupyter nbconvert --execute --to notebook --inplace /home/ec2-user/climaster/analyze_data/analyze.ipynb',
     dag=update_analyze_dag
 )
+
+update_task

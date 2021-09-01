@@ -17,7 +17,7 @@ default_arguments = {
 update_transform_disasters_dag = DAG(
     dag_id='update_transform_disasters',
     default_args=default_arguments,
-    schedule_interval=None
+    schedule_interval="0 1 * * 6"
 )
 
 # Task: update disasters
