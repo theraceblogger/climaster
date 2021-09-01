@@ -81,7 +81,7 @@ def get_data(station, api_calls):
 def load_data(url, country, region, station, api_calls, off_set=1):
     try:
         url2 = url + str(off_set)
-        time.sleep(.2)
+        time.sleep(.3)
         r = requests.get(url2, headers=header)
         api_calls += 1
 
