@@ -1,8 +1,7 @@
 from airflow.models import DAG
 from airflow.operators.bash import BashOperator
-from datetime import datetime, timedelta
+from datetime import datetime
 from airflow.utils.email import send_email
-from airflow.utils.dates import days_ago
 
 # Set arguments
 default_arguments = {
@@ -10,7 +9,7 @@ default_arguments = {
     'email': 'theraceblogger@comcast.net',
     'email_on_failure': True,
     'catchup': False,
-    'start_date': days_ago(1)
+    'start_date': datetime(2021, 09, 01)
 }
 
 # Create DAG
