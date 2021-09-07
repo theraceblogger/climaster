@@ -9,7 +9,7 @@ default_arguments = {
     'email': 'theraceblogger@comcast.net',
     'email_on_failure': True,
     'catchup': False,
-    'start_date': datetime(2021, 09, 01)
+    'start_date': datetime(2021, 9, 1)
 }
 
 # Create DAG
