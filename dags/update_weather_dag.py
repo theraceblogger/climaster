@@ -8,7 +8,6 @@ default_arguments = {
     'owner': 'chuck',
     'email': 'theraceblogger@comcast.net',
     'email_on_failure': True,
-    'catchup': False,
     'start_date': datetime(2021, 9, 1)
 }
 
