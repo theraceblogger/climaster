@@ -55,7 +55,7 @@ def get_data(station):
     
     country, region = meta[0][0], meta[0][1]
     end = date.today()
-    start = end - timedelta(days=14)
+    start = end - timedelta(days=60)
     
     end = end.strftime("%Y-%m-%d")
     start = start.strftime("%Y-%m-%d")

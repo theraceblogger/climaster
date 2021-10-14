@@ -8,14 +8,15 @@ default_arguments = {
     'owner': 'chuck',
     'email': 'theraceblogger@comcast.net',
     'email_on_failure': True,
-    'start_date': datetime(2021, 9, 1)
+    'start_date': datetime(2021, 10, 1)
 }
 
 # Create DAG
 update_transform_disasters_dag = DAG(
     dag_id='update_transform_disasters',
     default_args=default_arguments,
-    schedule_interval="0 1 * * 6"
+    #schedule_interval="0 1 * * 6"
+    schedule_interval=None
 )
 
 # Task: update disasters
