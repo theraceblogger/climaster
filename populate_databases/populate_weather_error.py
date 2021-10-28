@@ -1,4 +1,4 @@
-'''This script gets data from NOAA, of stations in weather.stations_to_load, and stores it in weather.weather_raw.'''
+'''This script gets data from NOAA, of stations in weather.station_error, and stores it in weather.weather_raw.'''
 
 import os
 import psycopg2
@@ -118,25 +118,21 @@ def load_data(url, country, region, station, api_calls, off_set=1):
     return api_calls
 
 
-# Main function - calls get_data() for stations not loaded and updates weather.stations_loaded (Must manually TRUNCATE)
+# Main function - calls get_data() for stations that had error and updates weather.stations_loaded (Must manually TRUNCATE)
 def get_weather():
     # get list of stations
     query = "SELECT station_id FROM weather.station_error"
     cur.execute(query)
     results = cur.fetchall()
 
-    stations = []
-    for result in results:
-        stations.append(result[0])
+    stations = [result[0] for result in results]
 
     # get list of stations loaded
     query = "SELECT station_id FROM weather.stations_loaded"
     cur.execute(query)
     results = cur.fetchall()
 
-    stations_loaded = []
-    for result in results:
-        stations_loaded.append(result[0])
+    stations_loaded = [result[0] for result in results]
     
     # get weather data and load into weather.weather_raw
     api_calls = 0
@@ -156,9 +152,7 @@ def get_weather():
             cur.execute(query)
             results = cur.fetchall()
 
-            stations_loaded = []
-            for result in results:
-                stations_loaded.append(result[0])
+            stations_loaded = [result[0] for result in results]
             print(len(stations_loaded), 'stations loaded out of', len(stations), 'stations\n')
             break
     return api_calls

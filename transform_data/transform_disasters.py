@@ -63,9 +63,7 @@ def get_disasters():
     cur.execute(query)
     results = cur.fetchall()
 
-    flat_results = []
-    for result in results:
-        flat_results.append(result[0])
+    flat_results = [result[0] for result in results]
     df = pd.DataFrame(flat_results)
 
     # add country code
@@ -82,5 +80,6 @@ def get_disasters():
             cur.execute(insert_sql, (result['Dis No'], result['Year'], result['Start Month'], result['cc'], result['Region'], result['Disaster Type'], result['Total Deaths'], result['Total Damages (\'000 US$)'], result['Year'], result['Start Month'], result['cc'], result['Region'], result['Disaster Type'], result['Total Deaths'], result['Total Damages (\'000 US$)']))
         except:
             print ('could not iterate through results')
+    return
 
 get_disasters()

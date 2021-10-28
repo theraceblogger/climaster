@@ -61,6 +61,7 @@ def get_stations(entry_number = 1):
                 
     except:
         print('Function failed')
+    return
 
 
 get_stations()

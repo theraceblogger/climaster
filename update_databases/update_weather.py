@@ -81,6 +81,7 @@ def get_data(station):
         else:
             url = base_url + dataset_id + datatype_id + datatype + station_id + station + start_date + str(int(start_yr) + year) + "-01-01" + end_date + str(int(start_yr) + year) + "-12-31" + units + limit + offset
             load_data(url, country, region)
+    return
 
 
 # Function gets the data and inserts it into the database, 1000 at a time
@@ -109,6 +110,7 @@ def load_data(url, country, region, off_set=1):
             print(url2)
     except KeyError:
         pass
+    return
 
 
 def get_weather():
@@ -117,9 +119,7 @@ def get_weather():
     cur.execute(query)
     results = cur.fetchall()
 
-    stations = []
-    for result in results:
-        stations.append(result[0])
+    stations = [result[0] for result in results]
     
     # empty stations_loaded table
     query = "TRUNCATE TABLE weather.stations_loaded"
@@ -130,9 +130,7 @@ def get_weather():
     cur.execute(query)
     results = cur.fetchall()
 
-    stations_loaded = []
-    for result in results:
-        stations_loaded.append(result[0])
+    stations_loaded = [result[0] for result in results]
 
     # get weather data and load into weather.weather_raw
     for station in stations:
@@ -146,6 +144,7 @@ def get_weather():
                 cur.execute(insert_sql, (station, station))
             except:
                 print ('could not update stations_loaded')
+    return
 
 
 get_weather()

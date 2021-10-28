@@ -122,6 +122,7 @@ def run_query(query):
         return request.json()
     else:
         raise Exception("Query failed to run by returning code of {}. {}".format(request.status_code, query))
+    return
 
 
 # Query to get the link for the data
@@ -143,6 +144,7 @@ def get_disasters():
             cur.execute(insert_sql, (result['Dis No'], json.dumps(result, indent=4, sort_keys=True), json.dumps(result, indent=4, sort_keys=True)))
         except:
             print ('could not iterate through results')
+    return
 
 
 get_disasters()

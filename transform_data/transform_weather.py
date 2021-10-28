@@ -50,10 +50,8 @@ def avg_daily_full():
         cur.execute(query)
         results = cur.fetchall()
 
-        flat_results = []
-        for result in results:
-            flat_results.append(result)
-        
+        flat_results = [result for result in results]
+
         field = pd.DataFrame(flat_results, columns=['date', field])
         dataframes.append(field)
     
@@ -77,6 +75,7 @@ def avg_daily_full():
                 result['SNWD'], result['TANM'], result['TMIN'], result['TMAX'], result['TAVG'], result['PRCP'], result['SNOW'], result['SNWD'], result['TANM']))
         except:
             print ('could not iterate through results')
+    return
 
 
 
@@ -94,9 +93,7 @@ def avg_daily_region(region):
         cur.execute(query)
         results = cur.fetchall()
 
-        flat_results = []
-        for result in results:
-            flat_results.append(result)
+        flat_results = [result for result in results]
         
         field = pd.DataFrame(flat_results, columns=['date', field])
         dataframes.append(field)
@@ -122,23 +119,23 @@ def avg_daily_region(region):
                 result['SNWD'], result['TANM'], result['TMIN'], result['TMAX'], result['TAVG'], result['PRCP'], result['SNOW'], result['SNWD'], result['TANM']))
         except:
             print ('could not iterate through results')
+    return
 
 
 def load_tables():
     # daily averages of each datatype for all regions
     avg_daily_full()
 
-    query = "SELECT DISTINCT wr.region FROM weather.weather_raw wr"
-    cur.execute(query)
-    results = cur.fetchall()
+    # query = "SELECT DISTINCT wr.region FROM weather.weather_raw wr"
+    # cur.execute(query)
+    # results = cur.fetchall()
 
-    regions = []
-    for result in results:
-        regions.append(result[0])
+    # regions = [result[0] for result in results]
     
-    # daily averages of each datatype for each region (24 regions)
-    for region in regions:
-        avg_daily_region(region)
+    # # daily averages of each datatype for each region (24 regions)
+    # for region in regions:
+    #     avg_daily_region(region)
+    return
 
 
 load_tables()

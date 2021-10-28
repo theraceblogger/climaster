@@ -124,9 +124,7 @@ def get_stations():
     cur.execute(query)
     results = cur.fetchall()
 
-    flat_results = []
-    for result in results:
-        flat_results.append(result[0])
+    flat_results = [result[0] for result in results]
     df = pd.DataFrame(flat_results)
 
     # use clustering algorithm and choose station with highest coverage
@@ -148,6 +146,7 @@ def get_stations():
             cur.execute(insert_sql, (result['id'], result['cc'], result['region'], json.dumps(result, indent=4, sort_keys=True), result['cc'], result['region'], json.dumps(result, indent=4, sort_keys=True))) 
         except:
             print ('could not iterate through results')
+    return
 
 
 get_stations()

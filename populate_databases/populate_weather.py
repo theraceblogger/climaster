@@ -128,18 +128,14 @@ def get_weather():
     cur.execute(query)
     results = cur.fetchall()
 
-    stations = []
-    for result in results:
-        stations.append(result[0])
+    stations = [result[0] for result in results]
 
     # get list of stations loaded
     query = "SELECT station_id FROM weather.stations_loaded"
     cur.execute(query)
     results = cur.fetchall()
 
-    stations_loaded = []
-    for result in results:
-        stations_loaded.append(result[0])
+    stations_loaded = [result[0] for result in results]
 
     # get weather data and load into weather.weather_raw
     api_calls = 0
@@ -159,9 +155,7 @@ def get_weather():
             cur.execute(query)
             results = cur.fetchall()
 
-            stations_loaded = []
-            for result in results:
-                stations_loaded.append(result[0])
+            stations_loaded = [result[0] for result in results]
             print(len(stations_loaded), 'stations loaded out of', len(stations), 'stations\n')
             break
     return api_calls
